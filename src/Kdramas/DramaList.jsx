@@ -56,8 +56,6 @@ export default function DramaList() {
                                 borderRadius: 3,
                                 boxShadow: 3,
                                 transition: "0.3s",
-                                width: "20dvw",
-                                height: "auto",
                                 "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
                             }}
                         >
