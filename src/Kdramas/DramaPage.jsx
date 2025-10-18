@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { db } from "../firebaseConfig";
 import {
-    doc,
+    collection,
+    query,
+    where,
+    getDocs,
     updateDoc,
     increment,
-    collection,
-    getDocs,
-    query,
-    where
+    doc,
 } from "firebase/firestore";
 import {
     Box,
@@ -29,81 +29,89 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 export default function DramaPage() {
     const { videoId } = useParams();
     const [drama, setDrama] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
     const [likes, setLikes] = useState(0);
     const [views, setViews] = useState(0);
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
     const [relatedDramas, setRelatedDramas] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDrama = async () => {
-            const q = query(collection(db, "dramas"), where("videoId", "==", videoId));
-            const querySnapshot = await getDocs(q);
+            try {
+                setLoading(true);
+                setError("");
 
-            if (!querySnapshot.empty) {
-                const docSnap = querySnapshot.docs[0];
-                const data = docSnap.data();
-                setDrama(data);
-                setLikes(data.likes || 0);
-                setViews((data.views || 0) + 1);
+                // videoId bo‘yicha qidiruv
+                const q = query(collection(db, "dramas"), where("videoId", "==", videoId));
+                const querySnapshot = await getDocs(q);
 
-                await updateDoc(docSnap.ref, { views: increment(1) });
-            } else {
-                console.log("Drama topilmadi");
+                if (!querySnapshot.empty) {
+                    const docSnap = querySnapshot.docs[0];
+                    const data = docSnap.data();
+                    setDrama({ id: docSnap.id, ...data });
+                    setLikes(data.likes || 0);
+                    setViews((data.views || 0) + 1);
+
+                    // Ko‘rishlar sonini yangilash
+                    await updateDoc(doc(db, "dramas", docSnap.id), {
+                        views: increment(1),
+                    });
+                } else {
+                    setError("Drama topilmadi ❌");
+                }
+
+                // Boshqa dramalar
+                const allDocs = await getDocs(collection(db, "dramas"));
+                const all = allDocs.docs.map((d) => ({ id: d.id, ...d.data() }));
+                setRelatedDramas(all.filter((d) => d.videoId !== videoId));
+            } catch (err) {
+                console.error(err);
+                setError("Ma'lumotni yuklashda xato yuz berdi 😢");
+            } finally {
+                setLoading(false);
             }
-
-            // Boshqa dramalarni olish
-            const allSnapshot = await getDocs(collection(db, "dramas"));
-            const allDramas = allSnapshot.docs.map((d) => ({
-                id: d.id,
-                ...d.data(),
-            }));
-            setRelatedDramas(allDramas.filter((d) => d.videoId !== videoId));
         };
 
         fetchDrama();
     }, [videoId]);
 
     const handleLike = async () => {
-        try {
-            const docRef = doc(db, "dramas", videoId);
-            await updateDoc(docRef, { likes: increment(1) });
-            setLikes((prev) => prev + 1);
-        } catch (err) {
-            console.error("Like bosishda xato:", err);
-        }
+        if (!drama) return;
+        await updateDoc(doc(db, "dramas", drama.id), { likes: increment(1) });
+        setLikes((prev) => prev + 1);
     };
 
     const handleAddComment = () => {
         if (comment.trim() === "") return;
         const newComment = { text: comment, date: new Date().toLocaleString() };
-        setComments((prev) => [newComment, ...prev]);
+        setComments([newComment, ...comments]);
         setComment("");
     };
 
-    if (loading)
+    if (loading) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-                <CircularProgress color="primary" />
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+                <CircularProgress color="primary" size={50} />
             </Box>
         );
+    }
 
-    if (!drama)
+    if (error) {
         return (
-            <Typography align="center" mt={5} color="error">
-                Ushbu drama topilmadi 😢
+            <Typography align="center" color="error" mt={5}>
+                {error}
             </Typography>
         );
+    }
 
     return (
         <Box sx={{ p: 3 }}>
-            {/* Video nomi */}
             <Typography variant="h4" fontWeight="bold" mb={2} align="center">
                 {drama.title}
             </Typography>
 
-            {/* Video */}
             <Box sx={{ display: "flex", justifyContent: "center" }}>
                 <Box sx={{ width: "100%", maxWidth: "900px" }}>
                     <iframe
@@ -146,7 +154,7 @@ export default function DramaPage() {
                 </Typography>
             </Box>
 
-            {/* Commentlar */}
+            {/* Kommentlar */}
             <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
                 <Divider sx={{ mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -162,12 +170,7 @@ export default function DramaPage() {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                     />
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleAddComment}
-                        sx={{ borderRadius: 2 }}
-                    >
+                    <Button variant="contained" onClick={handleAddComment}>
                         Yuborish
                     </Button>
                 </Box>
@@ -211,12 +214,7 @@ export default function DramaPage() {
                                     "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
                                 }}
                             >
-                                <CardMedia
-                                    component="img"
-                                    height="200"
-                                    image={d.thumbnail}
-                                    alt={d.title}
-                                />
+                                <CardMedia component="img" height="200" image={d.thumbnail} alt={d.title} />
                                 <CardContent>
                                     <Typography variant="h6" fontWeight="bold">
                                         {d.title}
@@ -227,8 +225,7 @@ export default function DramaPage() {
                                     <Button
                                         variant="contained"
                                         color="primary"
-                                        component={Link}
-                                        to={`/drama/${d.id}`}
+                                        href={`/drama/${d.videoId}`}
                                         sx={{ mt: 2, borderRadius: 2 }}
                                         fullWidth
                                     >

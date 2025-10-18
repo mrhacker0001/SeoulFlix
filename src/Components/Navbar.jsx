@@ -13,6 +13,8 @@ export default function Navbar() {
                 <Box>
                     <Button color="inherit" component={Link} to="/">Bosh sahifa</Button>
                     <Button color="inherit" component={Link} to="/search">Qidirish</Button>
+                    <Button color="inherit" component={Link} to="/signin">Qidirish</Button>
+                    <Button color="inherit" component={Link} to="/sign">Qidirish</Button>
                 </Box>
             </Toolbar>
         </AppBar>
