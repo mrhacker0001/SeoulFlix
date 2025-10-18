@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
+
 import {
     collection,
     query,
@@ -9,6 +10,12 @@ import {
     updateDoc,
     increment,
     doc,
+    addDoc,
+    orderBy,
+    onSnapshot,
+    deleteDoc,
+    getDoc,
+    setDoc
 } from "firebase/firestore";
 import {
     Box,
@@ -25,6 +32,7 @@ import {
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function DramaPage() {
     const { videoId } = useParams();
@@ -33,17 +41,26 @@ export default function DramaPage() {
     const [error, setError] = useState("");
     const [likes, setLikes] = useState(0);
     const [views, setViews] = useState(0);
+    const [liked, setLiked] = useState(false);
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState([]);
+    const [user, setUser] = useState(null);
     const [relatedDramas, setRelatedDramas] = useState([]);
 
+
+    // 🔹 Foydalanuvchini olish
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
+        return () => unsubscribe();
+    }, []);
+
+    // 🔹 Asosiy drama ma'lumotini olish
     useEffect(() => {
         const fetchDrama = async () => {
             try {
                 setLoading(true);
                 setError("");
 
-                // videoId bo‘yicha qidiruv
                 const q = query(collection(db, "dramas"), where("videoId", "==", videoId));
                 const querySnapshot = await getDocs(q);
 
@@ -54,15 +71,24 @@ export default function DramaPage() {
                     setLikes(data.likes || 0);
                     setViews((data.views || 0) + 1);
 
-                    // Ko‘rishlar sonini yangilash
+                    // 🔸 Ko‘rishlar sonini oshirish
                     await updateDoc(doc(db, "dramas", docSnap.id), {
                         views: increment(1),
                     });
+
+                    // 🔸 Agar foydalanuvchi like bosgan bo‘lsa
+                    if (user) {
+                        const likeRef = doc(db, "dramas", docSnap.id, "likes", user.uid);
+                        const likeSnap = await getDocs(collection(db, `dramas/${docSnap.id}/likes`));
+                        likeSnap.forEach((d) => {
+                            if (d.id === user.uid) setLiked(true);
+                        });
+                    }
                 } else {
                     setError("Drama topilmadi ❌");
                 }
 
-                // Boshqa dramalar
+                // 🔸 Boshqa dramalar
                 const allDocs = await getDocs(collection(db, "dramas"));
                 const all = allDocs.docs.map((d) => ({ id: d.id, ...d.data() }));
                 setRelatedDramas(all.filter((d) => d.videoId !== videoId));
@@ -75,18 +101,72 @@ export default function DramaPage() {
         };
 
         fetchDrama();
-    }, [videoId]);
+    }, [videoId, user]);
 
-    const handleLike = async () => {
+    // 🔹 Kommentlarni real-time olish
+    useEffect(() => {
         if (!drama) return;
-        await updateDoc(doc(db, "dramas", drama.id), { likes: increment(1) });
-        setLikes((prev) => prev + 1);
+        const commentsRef = collection(db, "dramas", drama.id, "comments");
+        const q = query(commentsRef, orderBy("date", "desc"));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setComments(snapshot.docs.map((doc) => doc.data()));
+        });
+
+        return () => unsubscribe();
+    }, [drama]);
+
+
+    const handleLike = async (dramaId, userId) => {
+        if (!userId) {
+            alert("Like bosish uchun tizimga kiring!");
+            return;
+        }
+
+        try {
+            const likeRef = doc(db, "dramas", dramaId, "likes", userId);
+            const likeSnap = await getDoc(likeRef);
+
+            if (likeSnap.exists()) {
+                // 🔸 Agar oldin like bosgan bo‘lsa — unlike qilamiz
+                await deleteDoc(likeRef);
+                await updateDoc(doc(db, "dramas", dramaId), {
+                    likes: increment(-1), // 🔽 umumiy like sonini kamaytirish
+                });
+                setLikes((prev) => prev - 1);
+                setLiked(false);
+            } else {
+                // 🔸 Yangi like yaratamiz
+                await setDoc(likeRef, { createdAt: new Date() });
+                await updateDoc(doc(db, "dramas", dramaId), {
+                    likes: increment(1), // 🔼 umumiy like sonini oshirish
+                });
+                setLikes((prev) => prev + 1);
+                setLiked(true);
+            }
+        } catch (error) {
+            console.error("Like error:", error);
+            alert("Xatolik yuz berdi, keyinroq urinib ko‘ring!");
+        }
     };
 
-    const handleAddComment = () => {
+
+    // 🔹 Komment qo‘shish funksiyasi
+    const handleAddComment = async () => {
+        if (!user) {
+            alert("Komment yozish uchun tizimga kiring!");
+            return;
+        }
         if (comment.trim() === "") return;
-        const newComment = { text: comment, date: new Date().toLocaleString() };
-        setComments([newComment, ...comments]);
+
+        const commentData = {
+            userId: user.uid,
+            userEmail: user.email,
+            text: comment.trim(),
+            date: new Date(),
+        };
+
+        await addDoc(collection(db, "dramas", drama.id, "comments"), commentData);
         setComment("");
     };
 
@@ -138,8 +218,11 @@ export default function DramaPage() {
                     alignItems: "center",
                 }}
             >
-                <IconButton onClick={handleLike} color="error">
-                    <FavoriteIcon />
+                <IconButton
+                    onClick={() => handleLike(drama.id, user?.uid)} // ✅ Parametrlar bilan chaqiramiz
+                    color={liked ? "error" : "default"}
+                >
+                    <FavoriteIcon sx={{ color: liked ? "red" : "gray" }} />
                 </IconButton>
                 <Typography>{likes} ta like</Typography>
 
@@ -185,7 +268,7 @@ export default function DramaPage() {
                                     color="text.secondary"
                                     sx={{ display: "block", textAlign: "right" }}
                                 >
-                                    {c.date}
+                                    {new Date(c.date.seconds * 1000).toLocaleString()}
                                 </Typography>
                             </Card>
                         ))}

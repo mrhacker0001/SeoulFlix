@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
 import {
     Grid,
     Card,
@@ -9,18 +9,42 @@ import {
     Typography,
     Button,
     Box,
+    Snackbar,
+    Alert,
 } from "@mui/material";
 
 export default function DramaList() {
     const [dramas, setDramas] = useState([]);
+    const [user, setUser] = useState(null);
+    const [alertOpen, setAlertOpen] = useState(false);
 
     useEffect(() => {
+        // 🔹 Auth holatini kuzatish
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser);
+        });
+
+        // 🔹 Firestore'dan dramaslarni olish
         const fetchData = async () => {
             const querySnapshot = await getDocs(collection(db, "dramas"));
-            setDramas(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+            setDramas(
+                querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+            );
         };
         fetchData();
+
+        return () => unsubscribe();
     }, []);
+
+    const handleWatch = (videoId) => {
+        if (!user) {
+            // 🔸 Agar profil yo‘q bo‘lsa — ogohlantirish chiqadi
+            setAlertOpen(true);
+        } else {
+            // 🔸 Agar foydalanuvchi mavjud bo‘lsa — tomosha sahifasiga o‘tadi
+            window.location.href = `/drama/${videoId}`;
+        }
+    };
 
     return (
         <Box sx={{ flexGrow: 1, padding: 3 }}>
@@ -83,7 +107,7 @@ export default function DramaList() {
                                     color="primary"
                                     fullWidth
                                     sx={{ mt: 2, borderRadius: 2 }}
-                                    href={`/drama/${drama.videoId}`}
+                                    onClick={() => handleWatch(drama.videoId)}
                                 >
                                     Tomosha qilish →
                                 </Button>
@@ -92,6 +116,18 @@ export default function DramaList() {
                     </Grid>
                 ))}
             </Grid>
+
+            {/* 🔹 Snackbar ogohlantirish */}
+            <Snackbar
+                open={alertOpen}
+                autoHideDuration={3000}
+                onClose={() => setAlertOpen(false)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
+                <Alert severity="warning" sx={{ width: "100%" }}>
+                    Iltimos, avval profil yarating!
+                </Alert>
+            </Snackbar>
         </Box>
     );
 }

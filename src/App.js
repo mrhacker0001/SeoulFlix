@@ -9,22 +9,31 @@ import Navbar from "./Components/Navbar";
 import SignUpPage from "./Sign/SignUpPage";
 import SignInPage from "./Sign/SignInPage";
 import Profile from "./Sign/Profile";
+import Footer from "./Components/Footer";
+import HelpPage from "./Kdramas/HelpPage";
 
 function App() {
   return (
     <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/dramalist" element={<DramaList />} />
-        <Route path="/drama/:videoId" element={<DramaPage />} />
-        <Route path="/admin/upload" element={<AdminUpload />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/profile" element={<Profile />} />
-
-      </Routes>
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/dramalist" element={<DramaList />} />
+          <Route path="/drama/:videoId" element={<DramaPage />} />
+          <Route path="/admin/upload" element={<AdminUpload />} />
+          <Route path="/search" element={<SearchPage />} />
+          <Route path="/signup" element={<SignUpPage />} />
+          <Route path="/signin" element={<SignInPage />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/help" element={<HelpPage />} />
+        </Routes>
+        <Footer />
+      </div>
     </Router>
   );
 }
