@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DramaList from "./Kdramas/DramaList";
 import DramaPage from "./Kdramas/DramaPage";
-import AdminUpload from "./Admin/AdminUpload";
 import Home from "./Kdramas/Home";
 import './index.css'
 import SearchPage from "./Kdramas/SearchPage";
@@ -11,6 +10,8 @@ import SignInPage from "./Sign/SignInPage";
 import Profile from "./Sign/Profile";
 import Footer from "./Components/Footer";
 import HelpPage from "./Kdramas/HelpPage";
+import AdminAddDrama from "./Admin/AdminAddDrama";
+import AdminAddEpisode from "./Admin/AdminAddEpisode";
 
 function App() {
   return (
@@ -25,7 +26,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dramalist" element={<DramaList />} />
           <Route path="/drama/:videoId" element={<DramaPage />} />
-          <Route path="/admin/upload" element={<AdminUpload />} />
+          <Route path="/admin/drama" element={<AdminAddDrama />} />
+          <Route path="/admin/episode" element={<AdminAddEpisode />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />

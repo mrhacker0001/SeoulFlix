@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import {
     Grid,
@@ -12,11 +12,13 @@ import {
     Snackbar,
     Alert,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function DramaList() {
     const [dramas, setDramas] = useState([]);
     const [user, setUser] = useState(null);
     const [alertOpen, setAlertOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // 🔹 Auth holatini kuzatish
@@ -24,9 +26,10 @@ export default function DramaList() {
             setUser(currentUser);
         });
 
-        // 🔹 Firestore'dan dramaslarni olish
+        // 🔹 Firestore'dan faqat asosiy dramalarni olish
         const fetchData = async () => {
-            const querySnapshot = await getDocs(collection(db, "dramas"));
+            const q = query(collection(db, "dramas"), orderBy("uploadDate", "desc"));
+            const querySnapshot = await getDocs(q);
             setDramas(
                 querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
             );
@@ -36,13 +39,13 @@ export default function DramaList() {
         return () => unsubscribe();
     }, []);
 
-    const handleWatch = (videoId) => {
+    const handleWatch = (dramaId) => {
         if (!user) {
-            // 🔸 Agar profil yo‘q bo‘lsa — ogohlantirish chiqadi
+            // 🔸 Agar foydalanuvchi login qilmagan bo‘lsa
             setAlertOpen(true);
         } else {
-            // 🔸 Agar foydalanuvchi mavjud bo‘lsa — tomosha sahifasiga o‘tadi
-            window.location.href = `/drama/${videoId}`;
+            // 🔸 Drama sahifasiga yo‘naltirish (epizodlar u yerda chiqadi)
+            navigate(`/drama/${dramaId}`);
         }
     };
 
@@ -71,16 +74,18 @@ export default function DramaList() {
                                     {drama.title}
                                 </Typography>
 
-                                <Typography variant="body2" color="text.secondary">
-                                    Tavsif: {drama.description}
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 1 }}
+                                >
+                                    {drama.description?.length > 100
+                                        ? drama.description.slice(0, 100) + "..."
+                                        : drama.description}
                                 </Typography>
 
                                 <Typography variant="body2" color="text.secondary">
-                                    Fasl: {drama.season}
-                                </Typography>
-
-                                <Typography variant="body2" color="text.secondary">
-                                    Qism: {drama.episode}
+                                    🌐 Til: {drama.lang?.toUpperCase() || "Noma’lum"}
                                 </Typography>
 
                                 {drama.uploadDate?.seconds && (
@@ -107,7 +112,7 @@ export default function DramaList() {
                                     color="primary"
                                     fullWidth
                                     sx={{ mt: 2, borderRadius: 2 }}
-                                    onClick={() => handleWatch(drama.videoId)}
+                                    onClick={() => handleWatch(drama.id)}
                                 >
                                     Tomosha qilish →
                                 </Button>
@@ -117,7 +122,7 @@ export default function DramaList() {
                 ))}
             </Grid>
 
-            {/* 🔹 Snackbar ogohlantirish */}
+            {/* 🔹 Profil ogohlantiruvchi Snackbar */}
             <Snackbar
                 open={alertOpen}
                 autoHideDuration={3000}
@@ -125,7 +130,7 @@ export default function DramaList() {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
                 <Alert severity="warning" sx={{ width: "100%" }}>
-                    Iltimos, avval profil yarating!
+                    Iltimos, avval profil yarating yoki tizimga kiring!
                 </Alert>
             </Snackbar>
         </Box>

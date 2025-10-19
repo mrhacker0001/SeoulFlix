@@ -1,34 +1,30 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
-
 import {
     collection,
-    query,
-    where,
+    getDoc,
     getDocs,
+    doc,
     updateDoc,
     increment,
-    doc,
     addDoc,
+    query,
     orderBy,
     onSnapshot,
+    setDoc,
     deleteDoc,
-    getDoc,
-    setDoc
 } from "firebase/firestore";
 import {
     Box,
     Typography,
+    Button,
+    CircularProgress,
     Card,
     CardContent,
-    CardMedia,
-    Grid,
     IconButton,
     TextField,
-    Button,
     Divider,
-    CircularProgress,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -37,289 +33,228 @@ import { onAuthStateChanged } from "firebase/auth";
 export default function DramaPage() {
     const { videoId } = useParams();
     const [drama, setDrama] = useState(null);
+    const [episodes, setEpisodes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [likes, setLikes] = useState(0);
-    const [views, setViews] = useState(0);
-    const [liked, setLiked] = useState(false);
-    const [comment, setComment] = useState("");
-    const [comments, setComments] = useState([]);
+    const [expandedEpisode, setExpandedEpisode] = useState(null); // 🔹 Qaysi epizod ochilgan
     const [user, setUser] = useState(null);
-    const [relatedDramas, setRelatedDramas] = useState([]);
+    const [likesMap, setLikesMap] = useState({}); // 🔹 Har epizod uchun like
+    const [commentsMap, setCommentsMap] = useState({}); // 🔹 Har epizod uchun kommentlar
+    const [commentTextMap, setCommentTextMap] = useState({}); // 🔹 Har epizod uchun input
 
-
-    // 🔹 Foydalanuvchini olish
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
         return () => unsubscribe();
     }, []);
 
-    // 🔹 Asosiy drama ma'lumotini olish
     useEffect(() => {
         const fetchDrama = async () => {
             try {
                 setLoading(true);
-                setError("");
+                const dramaRef = doc(db, "dramas", videoId);
+                const docSnap = await getDoc(dramaRef);
+                if (!docSnap.exists()) return;
 
-                const q = query(collection(db, "dramas"), where("videoId", "==", videoId));
-                const querySnapshot = await getDocs(q);
+                const data = docSnap.data();
+                setDrama({ id: docSnap.id, ...data });
 
-                if (!querySnapshot.empty) {
-                    const docSnap = querySnapshot.docs[0];
-                    const data = docSnap.data();
-                    setDrama({ id: docSnap.id, ...data });
-                    setLikes(data.likes || 0);
-                    setViews((data.views || 0) + 1);
+                const epSnap = await getDocs(
+                    collection(db, "dramas", videoId, "episodes")
+                );
+                const epList = epSnap.docs
+                    .map((d) => ({ id: d.id, ...d.data() }))
+                    .sort((a, b) => a.episodeNumber - b.episodeNumber);
 
-                    // 🔸 Ko‘rishlar sonini oshirish
-                    await updateDoc(doc(db, "dramas", docSnap.id), {
-                        views: increment(1),
+                setEpisodes(epList);
+                if (epList.length > 0) setExpandedEpisode(epList[0].id);
+
+                // 🔹 Har epizod uchun like va kommentlarni olish
+                epList.forEach(async (ep) => {
+                    // Likes
+                    const likesSnap = await getDocs(
+                        collection(db, "dramas", videoId, "episodes", ep.id, "likes")
+                    );
+                    setLikesMap((prev) => ({
+                        ...prev,
+                        [ep.id]: likesSnap.size,
+                    }));
+
+                    // Comments real-time
+                    const commentsRef = collection(
+                        db,
+                        "dramas",
+                        videoId,
+                        "episodes",
+                        ep.id,
+                        "comments"
+                    );
+                    const q = query(commentsRef, orderBy("date", "desc"));
+                    onSnapshot(q, (snapshot) => {
+                        setCommentsMap((prev) => ({
+                            ...prev,
+                            [ep.id]: snapshot.docs.map((doc) => doc.data()),
+                        }));
                     });
-
-                    // 🔸 Agar foydalanuvchi like bosgan bo‘lsa
-                    if (user) {
-                        const likeRef = doc(db, "dramas", docSnap.id, "likes", user.uid);
-                        const likeSnap = await getDocs(collection(db, `dramas/${docSnap.id}/likes`));
-                        likeSnap.forEach((d) => {
-                            if (d.id === user.uid) setLiked(true);
-                        });
-                    }
-                } else {
-                    setError("Drama topilmadi ❌");
-                }
-
-                // 🔸 Boshqa dramalar
-                const allDocs = await getDocs(collection(db, "dramas"));
-                const all = allDocs.docs.map((d) => ({ id: d.id, ...d.data() }));
-                setRelatedDramas(all.filter((d) => d.videoId !== videoId));
+                });
             } catch (err) {
                 console.error(err);
-                setError("Ma'lumotni yuklashda xato yuz berdi 😢");
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDrama();
-    }, [videoId, user]);
+    }, [videoId]);
 
-    // 🔹 Kommentlarni real-time olish
-    useEffect(() => {
-        if (!drama) return;
-        const commentsRef = collection(db, "dramas", drama.id, "comments");
-        const q = query(commentsRef, orderBy("date", "desc"));
+    const handleLike = async (epId) => {
+        if (!user) return alert("Avval tizimga kiring!");
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            setComments(snapshot.docs.map((doc) => doc.data()));
-        });
+        const likeRef = doc(
+            db,
+            "dramas",
+            videoId,
+            "episodes",
+            epId,
+            "likes",
+            user.uid
+        );
+        const likeSnap = await getDoc(likeRef);
 
-        return () => unsubscribe();
-    }, [drama]);
-
-
-    const handleLike = async (dramaId, userId) => {
-        if (!userId) {
-            alert("Like bosish uchun tizimga kiring!");
-            return;
+        if (likeSnap.exists()) {
+            await deleteDoc(likeRef);
+            setLikesMap((prev) => ({ ...prev, [epId]: prev[epId] - 1 }));
+        } else {
+            await setDoc(likeRef, { createdAt: new Date() });
+            setLikesMap((prev) => ({ ...prev, [epId]: prev[epId] + 1 || 1 }));
         }
+    };
 
-        try {
-            const likeRef = doc(db, "dramas", dramaId, "likes", userId);
-            const likeSnap = await getDoc(likeRef);
+    const handleAddComment = async (epId) => {
+        if (!user) return alert("Komment yozish uchun tizimga kiring!");
+        const text = commentTextMap[epId]?.trim();
+        if (!text) return;
 
-            if (likeSnap.exists()) {
-                // 🔸 Agar oldin like bosgan bo‘lsa — unlike qilamiz
-                await deleteDoc(likeRef);
-                await updateDoc(doc(db, "dramas", dramaId), {
-                    likes: increment(-1), // 🔽 umumiy like sonini kamaytirish
-                });
-                setLikes((prev) => prev - 1);
-                setLiked(false);
-            } else {
-                // 🔸 Yangi like yaratamiz
-                await setDoc(likeRef, { createdAt: new Date() });
-                await updateDoc(doc(db, "dramas", dramaId), {
-                    likes: increment(1), // 🔼 umumiy like sonini oshirish
-                });
-                setLikes((prev) => prev + 1);
-                setLiked(true);
+        await addDoc(
+            collection(db, "dramas", videoId, "episodes", epId, "comments"),
+            {
+                userId: user.uid,
+                userEmail: user.email,
+                text,
+                date: new Date(),
             }
-        } catch (error) {
-            console.error("Like error:", error);
-            alert("Xatolik yuz berdi, keyinroq urinib ko‘ring!");
-        }
+        );
+        setCommentTextMap((prev) => ({ ...prev, [epId]: "" }));
     };
 
-
-    // 🔹 Komment qo‘shish funksiyasi
-    const handleAddComment = async () => {
-        if (!user) {
-            alert("Komment yozish uchun tizimga kiring!");
-            return;
-        }
-        if (comment.trim() === "") return;
-
-        const commentData = {
-            userId: user.uid,
-            userEmail: user.email,
-            text: comment.trim(),
-            date: new Date(),
-        };
-
-        await addDoc(collection(db, "dramas", drama.id, "comments"), commentData);
-        setComment("");
-    };
-
-    if (loading) {
+    if (loading)
         return (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-                <CircularProgress color="primary" size={50} />
+                <CircularProgress color="primary" />
             </Box>
         );
-    }
 
-    if (error) {
+    if (!drama)
         return (
             <Typography align="center" color="error" mt={5}>
-                {error}
+                Drama topilmadi ❌
             </Typography>
         );
-    }
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h4" fontWeight="bold" mb={2} align="center">
+            <Typography variant="h4" align="center" fontWeight="bold" mb={2}>
                 {drama.title}
             </Typography>
 
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
-                <Box sx={{ width: "100%", maxWidth: "900px" }}>
-                    <iframe
-                        width="100%"
-                        height="500"
-                        src={`https://www.youtube.com/embed/${drama.videoId}`}
-                        title="Drama video"
-                        allowFullScreen
-                        style={{
-                            borderRadius: "16px",
-                            boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-                        }}
-                    ></iframe>
-                </Box>
-            </Box>
-
-            {/* Like va prosmotr */}
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 3,
-                    mt: 2,
-                    alignItems: "center",
-                }}
-            >
-                <IconButton
-                    onClick={() => handleLike(drama.id, user?.uid)} // ✅ Parametrlar bilan chaqiramiz
-                    color={liked ? "error" : "default"}
-                >
-                    <FavoriteIcon sx={{ color: liked ? "red" : "gray" }} />
-                </IconButton>
-                <Typography>{likes} ta like</Typography>
-
-                <VisibilityIcon sx={{ color: "gray" }} />
-                <Typography>{views} marta ko‘rilgan</Typography>
-            </Box>
-
-            {/* Tavsif */}
-            <Box sx={{ maxWidth: 800, mx: "auto", mt: 3 }}>
-                <Typography variant="body1" color="text.secondary">
-                    {drama.description || "Tavsif mavjud emas"}
-                </Typography>
-            </Box>
-
-            {/* Kommentlar */}
-            <Box sx={{ maxWidth: 800, mx: "auto", mt: 4 }}>
-                <Divider sx={{ mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                    Fikr qoldiring 💬
-                </Typography>
-
-                <Box sx={{ display: "flex", gap: 1 }}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        size="small"
-                        placeholder="Komment yozing..."
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                    />
-                    <Button variant="contained" onClick={handleAddComment}>
-                        Yuborish
+            {/* Epizod tugmalari */}
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 3, flexWrap: "wrap" }}>
+                {episodes.map((ep) => (
+                    <Button
+                        key={ep.id}
+                        variant={expandedEpisode === ep.id ? "contained" : "outlined"}
+                        onClick={() => setExpandedEpisode(ep.id)}
+                    >
+                        {`Qism ${ep.episode}`}
                     </Button>
-                </Box>
-
-                {comments.length > 0 ? (
-                    <Box sx={{ mt: 2 }}>
-                        {comments.map((c, i) => (
-                            <Card key={i} sx={{ mb: 1, p: 1.5, borderRadius: 2 }}>
-                                <Typography variant="body2">{c.text}</Typography>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ display: "block", textAlign: "right" }}
-                                >
-                                    {new Date(c.date.seconds * 1000).toLocaleString()}
-                                </Typography>
-                            </Card>
-                        ))}
-                    </Box>
-                ) : (
-                    <Typography variant="body2" color="text.secondary" mt={1}>
-                        Hozircha fikrlar yo‘q
-                    </Typography>
-                )}
+                ))}
             </Box>
 
-            {/* Boshqa dramalar */}
-            <Box sx={{ mt: 6 }}>
-                <Typography variant="h5" fontWeight="bold" mb={2}>
-                    Boshqa dramalar 🎥
-                </Typography>
-
-                <Grid container spacing={3}>
-                    {relatedDramas.slice(0, 3).map((d) => (
-                        <Grid item xs={12} sm={6} md={4} key={d.id}>
-                            <Card
-                                sx={{
-                                    borderRadius: 3,
-                                    boxShadow: 3,
-                                    transition: "0.3s",
-                                    "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
+            {/* Faol epizod */}
+            {episodes.map(
+                (ep) =>
+                    expandedEpisode === ep.id && (
+                        <Box key={ep.id} sx={{ width: "100%", maxWidth: 900, mx: "auto", mb: 4 }}>
+                            <Typography variant="h6" mb={1}>
+                                {ep.title || `Qism ${ep.episode}`}
+                            </Typography>
+                            <iframe
+                                width="100%"
+                                height="500"
+                                src={`https://www.youtube.com/embed/${ep.videoId}`}
+                                title={ep.title}
+                                allowFullScreen
+                                style={{
+                                    borderRadius: "16px",
+                                    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
                                 }}
-                            >
-                                <CardMedia component="img" height="200" image={d.thumbnail} alt={d.title} />
-                                <CardContent>
-                                    <Typography variant="h6" fontWeight="bold">
-                                        {d.title}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {d.description?.slice(0, 60)}...
-                                    </Typography>
+                            ></iframe>
+
+                            {/* Like va Kommentlar */}
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
+                                <IconButton
+                                    onClick={() => handleLike(ep.id)}
+                                    color={likesMap[ep.id] > 0 ? "error" : "default"}
+                                >
+                                    <FavoriteIcon sx={{ color: likesMap[ep.id] > 0 ? "red" : "gray" }} />
+                                </IconButton>
+                                <Typography>{likesMap[ep.id] || 0} ta like</Typography>
+                            </Box>
+
+                            {/* Kommentlar */}
+                            <Box sx={{ mt: 2 }}>
+                                <Divider sx={{ mb: 2 }} />
+                                <Typography variant="h6" gutterBottom>
+                                    Fikr qoldiring 💬
+                                </Typography>
+                                <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
+                                        size="small"
+                                        placeholder="Komment yozing..."
+                                        value={commentTextMap[ep.id] || ""}
+                                        onChange={(e) =>
+                                            setCommentTextMap((prev) => ({
+                                                ...prev,
+                                                [ep.id]: e.target.value,
+                                            }))
+                                        }
+                                    />
                                     <Button
                                         variant="contained"
-                                        color="primary"
-                                        href={`/drama/${d.videoId}`}
-                                        sx={{ mt: 2, borderRadius: 2 }}
-                                        fullWidth
+                                        onClick={() => handleAddComment(ep.id)}
                                     >
-                                        Tomosha qilish →
+                                        Yuborish
                                     </Button>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                                </Box>
+
+                                {commentsMap[ep.id]?.length > 0 ? (
+                                    commentsMap[ep.id].map((c, i) => (
+                                        <Card key={i} sx={{ mb: 1, p: 1.5 }}>
+                                            <Typography variant="body2">{c.text}</Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {new Date(c.date.seconds * 1000).toLocaleString()}
+                                            </Typography>
+                                        </Card>
+                                    ))
+                                ) : (
+                                    <Typography variant="body2" color="text.secondary" mt={1}>
+                                        Hozircha fikrlar yo‘q
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Box>
+                    )
+            )}
         </Box>
     );
 }
