@@ -9,14 +9,14 @@ import {
     CardMedia,
     CardContent,
     Typography,
+    CardActionArea,
 } from "@mui/material";
-
-
+import { useNavigate } from "react-router-dom";
 
 export default function SearchPage() {
     const [query, setQuery] = useState("");
     const [dramas, setDramas] = useState([]);
-
+    const navigate = useNavigate();
 
     const filtered = dramas.filter((d) =>
         d.title.toLowerCase().includes(query.toLowerCase())
@@ -29,6 +29,10 @@ export default function SearchPage() {
         };
         fetchData();
     }, []);
+
+    const handleClick = (id) => {
+        navigate(`/drama/${id}`);
+    };
 
     return (
         <Container sx={{ mt: 4 }}>
@@ -45,10 +49,17 @@ export default function SearchPage() {
                 {filtered.map((drama) => (
                     <Grid item xs={12} sm={6} md={4} key={drama.id}>
                         <Card sx={{ bgcolor: "background.paper" }}>
-                            <CardMedia component="img" height="200" image={drama.thumbnail} />
-                            <CardContent>
-                                <Typography variant="h6">{drama.title}</Typography>
-                            </CardContent>
+                            <CardActionArea onClick={() => handleClick(drama.id)}>
+                                <CardMedia
+                                    component="img"
+                                    height="200"
+                                    image={drama.thumbnail}
+                                    alt={drama.title}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6">{drama.title}</Typography>
+                                </CardContent>
+                            </CardActionArea>
                         </Card>
                     </Grid>
                 ))}

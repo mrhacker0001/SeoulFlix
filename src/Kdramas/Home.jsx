@@ -11,6 +11,16 @@ export default function HomePage() {
             title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
             subtitle: "Biz bilan hamkorlik qiling!",
         },
+        {
+            imageUrl: banner,
+            title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
+            subtitle: "Biz bilan hamkorlik qiling!",
+        },
+        {
+            imageUrl: banner,
+            title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
+            subtitle: "Biz bilan hamkorlik qiling!",
+        },
     ];
 
     return (

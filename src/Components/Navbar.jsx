@@ -79,7 +79,7 @@ export default function Navbar() {
                                 to="/profile"
                                 startIcon={<Avatar src={user.photoURL} sx={{ width: 30, height: 30 }} />}
                             >
-                                Profil
+                                
                             </Button>
                         ) : (
                             <>

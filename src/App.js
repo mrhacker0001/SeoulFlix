@@ -25,7 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dramalist" element={<DramaList />} />
-          <Route path="/drama/:videoId" element={<DramaPage />} />
+          <Route path="/drama/:id" element={<DramaPage />} />
           <Route path="/admin/drama" element={<AdminAddDrama />} />
           <Route path="/admin/episode" element={<AdminAddEpisode />} />
           <Route path="/search" element={<SearchPage />} />

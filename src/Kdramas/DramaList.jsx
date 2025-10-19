@@ -21,18 +21,14 @@ export default function DramaList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // 🔹 Auth holatini kuzatish
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             setUser(currentUser);
         });
 
-        // 🔹 Firestore'dan faqat asosiy dramalarni olish
         const fetchData = async () => {
             const q = query(collection(db, "dramas"), orderBy("uploadDate", "desc"));
             const querySnapshot = await getDocs(q);
-            setDramas(
-                querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-            );
+            setDramas(querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         };
         fetchData();
 
@@ -41,10 +37,9 @@ export default function DramaList() {
 
     const handleWatch = (dramaId) => {
         if (!user) {
-            // 🔸 Agar foydalanuvchi login qilmagan bo‘lsa
             setAlertOpen(true);
         } else {
-            // 🔸 Drama sahifasiga yo‘naltirish (epizodlar u yerda chiqadi)
+            // ✅ endi drama ID orqali navigatsiya qilamiz (videoId emas!)
             navigate(`/drama/${dramaId}`);
         }
     };
@@ -74,11 +69,7 @@ export default function DramaList() {
                                     {drama.title}
                                 </Typography>
 
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
-                                    sx={{ mb: 1 }}
-                                >
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                     {drama.description?.length > 100
                                         ? drama.description.slice(0, 100) + "..."
                                         : drama.description}
@@ -112,7 +103,7 @@ export default function DramaList() {
                                     color="primary"
                                     fullWidth
                                     sx={{ mt: 2, borderRadius: 2 }}
-                                    onClick={() => handleWatch(drama.id)}
+                                    onClick={() => handleWatch(drama.id)} // ✅ shu joy o‘zgardi
                                 >
                                     Tomosha qilish →
                                 </Button>
@@ -122,7 +113,6 @@ export default function DramaList() {
                 ))}
             </Grid>
 
-            {/* 🔹 Profil ogohlantiruvchi Snackbar */}
             <Snackbar
                 open={alertOpen}
                 autoHideDuration={3000}

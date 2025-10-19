@@ -13,6 +13,11 @@ import {
     getDownloadURL,
 } from "firebase/storage";
 import {
+    getFirestore,
+    doc,
+    getDoc,
+} from "firebase/firestore";
+import {
     Button,
     Avatar,
     TextField,
@@ -20,6 +25,7 @@ import {
     Modal,
     Box,
     Paper,
+    CircularProgress,
 } from "@mui/material";
 
 const modalStyle = {
@@ -37,20 +43,34 @@ const modalStyle = {
 export default function Profile() {
     const auth = getAuth();
     const storage = getStorage();
+    const db = getFirestore();
+
     const [user, setUser] = useState(null);
+    const [userData, setUserData] = useState(null); // Firestore'dan olingan ma'lumot
     const [photo, setPhoto] = useState(null);
     const [preview, setPreview] = useState(null);
     const [open, setOpen] = useState(false);
     const [newPassword, setNewPassword] = useState("");
+    const [loading, setLoading] = useState(true);
 
+    // 🔹 Auth o‘zgarishini kuzatish
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
             setPreview(currentUser?.photoURL || null);
+            if (currentUser) {
+                const docRef = doc(db, "users", currentUser.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    setUserData(docSnap.data());
+                }
+            }
+            setLoading(false);
         });
         return () => unsubscribe();
-    }, [auth]);
+    }, [auth, db]);
 
+    // 🔹 Rasmni oldindan ko‘rsatish
     useEffect(() => {
         if (photo) {
             const reader = new FileReader();
@@ -65,7 +85,6 @@ export default function Profile() {
             const storageRef = ref(storage, `profilePhotos/${user.uid}`);
             await uploadBytes(storageRef, photo);
             const url = await getDownloadURL(storageRef);
-
             await updateProfile(user, { photoURL: url });
             setPreview(url);
             alert("Profil rasmi muvaffaqiyatli yangilandi ✅");
@@ -87,8 +106,16 @@ export default function Profile() {
 
     const handleLogout = async () => {
         await signOut(auth);
-        window.location.href = "/signin"; // logoutdan keyin sign in sahifasiga yo‘naltirish
+        window.location.href = "/signin";
     };
+
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" mt={10}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     if (!user) {
         return (
@@ -116,7 +143,7 @@ export default function Profile() {
                     maxWidth: 400,
                     textAlign: "center",
                     display: "flex",
-                    flexDirection: "column"
+                    flexDirection: "column",
                 }}
             >
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
@@ -156,7 +183,15 @@ export default function Profile() {
                 )}
 
                 <Typography variant="body1" sx={{ mt: 1 }}>
+                    <strong>Ism:</strong> {userData?.name || user.displayName || "—"}
+                </Typography>
+
+                <Typography variant="body1" sx={{ mt: 1 }}>
                     <strong>Email:</strong> {user.email}
+                </Typography>
+
+                <Typography variant="body1" sx={{ mt: 1 }}>
+                    <strong>Telefon raqam:</strong> {userData?.phone || "—"}
                 </Typography>
 
                 <Button

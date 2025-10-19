@@ -6,8 +6,6 @@ import {
     getDoc,
     getDocs,
     doc,
-    updateDoc,
-    increment,
     addDoc,
     query,
     orderBy,
@@ -21,25 +19,23 @@ import {
     Button,
     CircularProgress,
     Card,
-    CardContent,
     IconButton,
     TextField,
     Divider,
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { onAuthStateChanged } from "firebase/auth";
 
 export default function DramaPage() {
-    const { videoId } = useParams();
+    const { id } = useParams(); // 🔹 App.jsx bilan mos ( /drama/:id )
     const [drama, setDrama] = useState(null);
     const [episodes, setEpisodes] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [expandedEpisode, setExpandedEpisode] = useState(null); // 🔹 Qaysi epizod ochilgan
+    const [expandedEpisode, setExpandedEpisode] = useState(null);
     const [user, setUser] = useState(null);
-    const [likesMap, setLikesMap] = useState({}); // 🔹 Har epizod uchun like
-    const [commentsMap, setCommentsMap] = useState({}); // 🔹 Har epizod uchun kommentlar
-    const [commentTextMap, setCommentTextMap] = useState({}); // 🔹 Har epizod uchun input
+    const [likesMap, setLikesMap] = useState({});
+    const [commentsMap, setCommentsMap] = useState({});
+    const [commentTextMap, setCommentTextMap] = useState({});
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -50,16 +46,24 @@ export default function DramaPage() {
         const fetchDrama = async () => {
             try {
                 setLoading(true);
-                const dramaRef = doc(db, "dramas", videoId);
+
+                // 🔹 Drama ma'lumotlarini olish
+                const dramaRef = doc(db, "dramas", id);
                 const docSnap = await getDoc(dramaRef);
-                if (!docSnap.exists()) return;
+
+                if (!docSnap.exists()) {
+                    console.error("Drama topilmadi");
+                    setDrama(null);
+                    setLoading(false);
+                    return;
+                }
 
                 const data = docSnap.data();
                 setDrama({ id: docSnap.id, ...data });
 
-                const epSnap = await getDocs(
-                    collection(db, "dramas", videoId, "episodes")
-                );
+                // 🔹 Epizodlarni olish
+                const epSnap = await getDocs(collection(db, "dramas", id, "episodes"));
+
                 const epList = epSnap.docs
                     .map((d) => ({ id: d.id, ...d.data() }))
                     .sort((a, b) => a.episodeNumber - b.episodeNumber);
@@ -67,26 +71,19 @@ export default function DramaPage() {
                 setEpisodes(epList);
                 if (epList.length > 0) setExpandedEpisode(epList[0].id);
 
-                // 🔹 Har epizod uchun like va kommentlarni olish
-                epList.forEach(async (ep) => {
+                // 🔹 Har epizod uchun like va kommentlarni real-time olish
+                epList.forEach((ep) => {
                     // Likes
-                    const likesSnap = await getDocs(
-                        collection(db, "dramas", videoId, "episodes", ep.id, "likes")
-                    );
-                    setLikesMap((prev) => ({
-                        ...prev,
-                        [ep.id]: likesSnap.size,
-                    }));
+                    const likesRef = collection(db, "dramas", id, "episodes", ep.id, "likes");
+                    getDocs(likesRef).then((likesSnap) => {
+                        setLikesMap((prev) => ({
+                            ...prev,
+                            [ep.id]: likesSnap.size,
+                        }));
+                    });
 
                     // Comments real-time
-                    const commentsRef = collection(
-                        db,
-                        "dramas",
-                        videoId,
-                        "episodes",
-                        ep.id,
-                        "comments"
-                    );
+                    const commentsRef = collection(db, "dramas", id, "episodes", ep.id, "comments");
                     const q = query(commentsRef, orderBy("date", "desc"));
                     onSnapshot(q, (snapshot) => {
                         setCommentsMap((prev) => ({
@@ -96,27 +93,19 @@ export default function DramaPage() {
                     });
                 });
             } catch (err) {
-                console.error(err);
+                console.error("Xato:", err);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDrama();
-    }, [videoId]);
+    }, [id]);
 
     const handleLike = async (epId) => {
         if (!user) return alert("Avval tizimga kiring!");
 
-        const likeRef = doc(
-            db,
-            "dramas",
-            videoId,
-            "episodes",
-            epId,
-            "likes",
-            user.uid
-        );
+        const likeRef = doc(db, "dramas", id, "episodes", epId, "likes", user.uid);
         const likeSnap = await getDoc(likeRef);
 
         if (likeSnap.exists()) {
@@ -124,7 +113,7 @@ export default function DramaPage() {
             setLikesMap((prev) => ({ ...prev, [epId]: prev[epId] - 1 }));
         } else {
             await setDoc(likeRef, { createdAt: new Date() });
-            setLikesMap((prev) => ({ ...prev, [epId]: prev[epId] + 1 || 1 }));
+            setLikesMap((prev) => ({ ...prev, [epId]: (prev[epId] || 0) + 1 }));
         }
     };
 
@@ -133,15 +122,13 @@ export default function DramaPage() {
         const text = commentTextMap[epId]?.trim();
         if (!text) return;
 
-        await addDoc(
-            collection(db, "dramas", videoId, "episodes", epId, "comments"),
-            {
-                userId: user.uid,
-                userEmail: user.email,
-                text,
-                date: new Date(),
-            }
-        );
+        await addDoc(collection(db, "dramas", id, "episodes", epId, "comments"), {
+            userId: user.uid,
+            userEmail: user.email,
+            text,
+            date: new Date(),
+        });
+
         setCommentTextMap((prev) => ({ ...prev, [epId]: "" }));
     };
 
@@ -165,56 +152,74 @@ export default function DramaPage() {
                 {drama.title}
             </Typography>
 
-            {/* Epizod tugmalari */}
-            <Box sx={{ display: "flex", justifyContent: "center", gap: 1, mb: 3, flexWrap: "wrap" }}>
+            {/* 🔹 Epizodlar tugmalari */}
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: 1,
+                    mb: 3,
+                    flexWrap: "wrap",
+                }}
+            >
                 {episodes.map((ep) => (
                     <Button
                         key={ep.id}
                         variant={expandedEpisode === ep.id ? "contained" : "outlined"}
                         onClick={() => setExpandedEpisode(ep.id)}
                     >
-                        {`Qism ${ep.episode}`}
+                        {`Qism ${ep.episodeNumber || ep.episode}`}
                     </Button>
                 ))}
             </Box>
 
-            {/* Faol epizod */}
+            {/* 🔹 Faol epizod */}
             {episodes.map(
                 (ep) =>
                     expandedEpisode === ep.id && (
-                        <Box key={ep.id} sx={{ width: "100%", maxWidth: 900, mx: "auto", mb: 4 }}>
+                        <Box
+                            key={ep.id}
+                            sx={{ width: "100%", maxWidth: 900, mx: "auto", mb: 4 }}
+                        >
                             <Typography variant="h6" mb={1}>
                                 {ep.title || `Qism ${ep.episode}`}
                             </Typography>
-                            <iframe
-                                width="100%"
-                                height="500"
-                                src={`https://www.youtube.com/embed/${ep.videoId}`}
-                                title={ep.title}
-                                allowFullScreen
-                                style={{
-                                    borderRadius: "16px",
-                                    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-                                }}
-                            ></iframe>
 
-                            {/* Like va Kommentlar */}
+                            {ep.videoId ? (
+                                <iframe
+                                    width="100%"
+                                    height="500"
+                                    src={`https://www.youtube.com/embed/${ep.videoId}`}
+                                    title={ep.title}
+                                    allowFullScreen
+                                    style={{
+                                        borderRadius: "16px",
+                                        boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                                    }}
+                                ></iframe>
+                            ) : (
+                                <Typography color="error" mt={2}>
+                                    Video ID topilmadi
+                                </Typography>
+                            )}
+
+                            {/* 🔹 Like va kommentlar */}
                             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
-                                <IconButton
-                                    onClick={() => handleLike(ep.id)}
-                                    color={likesMap[ep.id] > 0 ? "error" : "default"}
-                                >
-                                    <FavoriteIcon sx={{ color: likesMap[ep.id] > 0 ? "red" : "gray" }} />
+                                <IconButton onClick={() => handleLike(ep.id)}>
+                                    <FavoriteIcon
+                                        sx={{ color: likesMap[ep.id] > 0 ? "red" : "gray" }}
+                                    />
                                 </IconButton>
                                 <Typography>{likesMap[ep.id] || 0} ta like</Typography>
                             </Box>
 
-                            {/* Kommentlar */}
+                            {/* 🔹 Kommentlar */}
                             <Box sx={{ mt: 2 }}>
                                 <Divider sx={{ mb: 2 }} />
                                 <Typography variant="h6" gutterBottom>
                                     Fikr qoldiring 💬
                                 </Typography>
+
                                 <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                                     <TextField
                                         fullWidth
@@ -229,10 +234,7 @@ export default function DramaPage() {
                                             }))
                                         }
                                     />
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => handleAddComment(ep.id)}
-                                    >
+                                    <Button variant="contained" onClick={() => handleAddComment(ep.id)}>
                                         Yuborish
                                     </Button>
                                 </Box>
@@ -241,7 +243,10 @@ export default function DramaPage() {
                                     commentsMap[ep.id].map((c, i) => (
                                         <Card key={i} sx={{ mb: 1, p: 1.5 }}>
                                             <Typography variant="body2">{c.text}</Typography>
-                                            <Typography variant="caption" color="text.secondary">
+                                            <Typography
+                                                variant="caption"
+                                                color="text.secondary"
+                                            >
                                                 {new Date(c.date.seconds * 1000).toLocaleString()}
                                             </Typography>
                                         </Card>
