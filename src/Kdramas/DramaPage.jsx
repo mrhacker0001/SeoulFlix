@@ -62,14 +62,20 @@ export default function DramaPage() {
                 setDrama({ id: docSnap.id, ...data });
 
                 // 🔹 Epizodlarni olish
+                // 🔹 Epizodlarni olish
                 const epSnap = await getDocs(collection(db, "dramas", id, "episodes"));
 
                 const epList = epSnap.docs
                     .map((d) => ({ id: d.id, ...d.data() }))
-                    .sort((a, b) => a.episodeNumber - b.episodeNumber);
+                    .sort((a, b) => {
+                        const numA = Number(a.episode || a.episode || 0);
+                        const numB = Number(b.episode || b.episode || 0);
+                        return numA - numB;
+                    });
 
                 setEpisodes(epList);
                 if (epList.length > 0) setExpandedEpisode(epList[0].id);
+
 
                 // 🔹 Har epizod uchun like va kommentlarni real-time olish
                 epList.forEach((ep) => {
@@ -203,7 +209,6 @@ export default function DramaPage() {
                                 </Typography>
                             )}
 
-                            {/* 🔹 Like va kommentlar */}
                             <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1 }}>
                                 <IconButton onClick={() => handleLike(ep.id)}>
                                     <FavoriteIcon
