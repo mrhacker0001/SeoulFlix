@@ -40,6 +40,7 @@ export default function HelpPage() {
             answer:
                 "Agar sizda muammo bo‘lsa, bizga Telegram orqali @seoulflix_admin bilan bog‘laning Yoki +998 87 355 0024 raqamiga aloqaga chiqing",
         },
+
         {
             question: "Qanday qilib saytni qo'llab-quvvatlasak bo'ladi?",
             answer: (
@@ -54,11 +55,16 @@ export default function HelpPage() {
                     >
                         tirikchilik.uz/seoulflix
                     </a>
-                    
+
                     Sizning yordamlaringiz bizga platformani yanada yaxshilashga yordam beradi 💖
                 </>
             ),
+        },
+        {
+            "question": "Saytdagi filmlar kim tomonidan dublyaj qilinadi?",
+            "answer": "Saytdagi barcha filmlar va seriallar Minxo tv jamoasi tomonidan o‘zbek tiliga dublyaj qilinadi."
         }
+
 
     ];
 

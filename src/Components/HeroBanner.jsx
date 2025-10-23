@@ -41,7 +41,7 @@ export default function HeroBanner({ banners }) {
                                 left: 0,
                                 width: "100%",
                                 height: "100%",
-                                backgroundColor: "rgba(0, 0, 0, 0.45)",
+                                // backgroundColor: "rgba(0, 0, 0, 0.45)",
                             }}
                         />
 
@@ -52,14 +52,14 @@ export default function HeroBanner({ banners }) {
                                 bottom: { xs: "20px", sm: "40px" },
                                 left: { xs: "20px", sm: "50px" },
                                 color: "white",
-                                zIndex: 2,
+                                // zIndex: 2,
                             }}
                         >
                             <Typography
                                 variant="h4"
                                 sx={{
                                     fontWeight: "bold",
-                                    fontSize: { xs: "1.3rem", sm: "2rem" },
+                                    fontSize: { xs: "1rem", sm: "1.5rem" },
                                     textShadow: "2px 2px 5px rgba(0,0,0,0.6)",
                                 }}
                             >
@@ -69,7 +69,7 @@ export default function HeroBanner({ banners }) {
                                 variant="subtitle1"
                                 sx={{
                                     mt: 1,
-                                    fontSize: { xs: "0.9rem", sm: "1.2rem" },
+                                    fontSize: { xs: "0.9rem", sm: "1rem" },
                                     textShadow: "1px 1px 4px rgba(0,0,0,0.5)",
                                 }}
                             >
