@@ -39,7 +39,6 @@ export default function DramaList() {
         if (!user) {
             setAlertOpen(true);
         } else {
-            // ✅ endi drama ID orqali navigatsiya qilamiz (videoId emas!)
             navigate(`/drama/${dramaId}`);
         }
     };
@@ -53,57 +52,80 @@ export default function DramaList() {
                             sx={{
                                 borderRadius: 3,
                                 boxShadow: 3,
+                                overflow: "hidden", // 🔹 ortiqcha rasm chiqmasin
+                                display: "flex",
+                                flexDirection: "column",
+                                height: "100%",
+                                width: 330,
                                 transition: "0.3s",
                                 "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
                             }}
                         >
                             <CardMedia
                                 component="img"
-                                height="350"
                                 image={drama.thumbnail}
                                 alt={drama.title}
+                                sx={{
+                                    height: 350, // 🔹 barcha rasmlar uchun bir xil balandlik
+                                    width: "100%",
+                                    objectFit: "cover", // 🔹 rasm markazda va to‘liq joylashadi
+                                }}
                             />
 
-                            <CardContent>
-                                <Typography variant="h6" fontWeight="bold">
-                                    {drama.title}
-                                </Typography>
-
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    {drama.description?.length > 100
-                                        ? drama.description.slice(0, 100) + "..."
-                                        : drama.description}
-                                </Typography>
-
-                                <Typography variant="body2" color="text.secondary">
-                                    🌐 Til: {drama.lang?.toUpperCase() || "Noma’lum"}
-                                </Typography>
-
-                                {drama.uploadDate?.seconds && (
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                        display="block"
-                                        mt={1}
-                                    >
-                                        Yuklangan sana:{" "}
-                                        {new Date(drama.uploadDate.seconds * 1000).toLocaleDateString(
-                                            "en-US",
-                                            {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            }
-                                        )}
+                            <CardContent
+                                sx={{
+                                    flexGrow: 1,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "space-between",
+                                }}
+                            >
+                                <Box>
+                                    <Typography variant="h6" fontSize="20px" fontWeight="bold">
+                                        {drama.title}
                                     </Typography>
-                                )}
+
+                                    <Typography
+                                        variant="body2"
+                                        fontSize="14px"
+                                        color="text.secondary"
+                                        sx={{ mb: 1 }}
+                                    >
+                                        {drama.description?.length > 100
+                                            ? drama.description.slice(0, 100) + "..."
+                                            : drama.description}
+                                    </Typography>
+
+                                    <Typography variant="body2" color="text.secondary">
+                                        🌐 Til: {drama.lang?.toUpperCase() || "Noma’lum"}
+                                    </Typography>
+
+                                    {drama.uploadDate?.seconds && (
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                            display="block"
+                                            mt={1}
+                                        >
+                                            Yuklangan sana:{" "}
+                                            {new Date(drama.uploadDate.seconds * 1000).toLocaleDateString(
+                                                "en-US",
+                                                {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                }
+                                            )}
+                                        </Typography>
+                                    )}
+                                </Box>
 
                                 <Button
                                     variant="contained"
                                     color="primary"
                                     fullWidth
                                     sx={{ mt: 2, borderRadius: 2 }}
-                                    onClick={() => handleWatch(drama.id)} // ✅ shu joy o‘zgardi
+                                    onClick={() => handleWatch(drama.id)}
                                 >
                                     Tomosha qilish →
                                 </Button>
