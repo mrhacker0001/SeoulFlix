@@ -56,7 +56,7 @@ export default function DramaList() {
                                 display: "flex",
                                 flexDirection: "column",
                                 height: "100%",
-                                width: 330,
+                                width: 300,
                                 transition: "0.3s",
                                 "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
                             }}
