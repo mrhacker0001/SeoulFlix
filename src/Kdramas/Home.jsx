@@ -2,24 +2,24 @@ import React from "react";
 import { Container, Typography } from "@mui/material";
 import DramaList from "./DramaList";
 import HeroBanner from "../Components/HeroBanner";
-import banner from "./reklama.jpeg";
+import banner from "./banner.jpg";
 
 export default function HomePage() {
     const banners = [
         {
             imageUrl: banner,
-            title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
-            subtitle: "Biz bilan hamkorlik qiling!",
+            title: "BU YERDA TELEGRAM KANALIMIZ MAVJUD",
+            subtitle: "TELEGRAM KANALIMIZ",
         },
         {
             imageUrl: banner,
-            title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
-            subtitle: "Biz bilan hamkorlik qiling!",
+            title: "BU YERDA TELEGRAM KANALIMIZ MAVJUD",
+            subtitle: "TELEGRAM KANALIMIZ",
         },
         {
             imageUrl: banner,
-            title: "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
-            subtitle: "Biz bilan hamkorlik qiling!",
+            title: "BU YERDA TELEGRAM KANALIMIZ MAVJUD",
+            subtitle: "TELEGRAM KANALIMIZ",
         },
     ];
 

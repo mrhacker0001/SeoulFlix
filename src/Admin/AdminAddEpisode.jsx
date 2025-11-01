@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
-import {
-    collection,
-    getDocs,
-    addDoc,
-    query,
-    orderBy,
-    serverTimestamp,
-} from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { apiGet, apiPost } from "../api";
+import { Snackbar, Alert } from "@mui/material";
 
 export default function AdminAddEpisode() {
     const [dramas, setDramas] = useState([]);
@@ -19,14 +12,16 @@ export default function AdminAddEpisode() {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [toast, setToast] = useState({ open: false, msg: "", type: "success" });
 
     useEffect(() => {
         const fetchDramas = async () => {
-            const q = query(collection(db, "dramas"), orderBy("uploadDate", "desc"));
-            const querySnapshot = await getDocs(q);
-            setDramas(
-                querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-            );
+            try {
+                const list = await apiGet('/api/dramas');
+                setDramas(list);
+            } catch (e) {
+                console.error(e);
+            }
         };
         fetchDramas();
     }, []);
@@ -42,6 +37,16 @@ export default function AdminAddEpisode() {
         e.preventDefault();
         if (!selectedDrama) {
             setMessage("⚠️ Avval drama tanlang!");
+            setToast({ open: true, msg: "Dramani tanlang", type: "warning" });
+            return;
+        }
+
+        if (!formData.episode.trim() || !formData.videoId.trim()) {
+            setToast({ open: true, msg: "Epizod va video ID majburiy", type: "warning" });
+            return;
+        }
+        if (isNaN(Number(formData.episode))) {
+            setToast({ open: true, msg: "Epizod raqami son bo'lishi kerak", type: "warning" });
             return;
         }
 
@@ -49,11 +54,9 @@ export default function AdminAddEpisode() {
         setMessage("");
 
         try {
-            await addDoc(collection(db, `dramas/${selectedDrama}/episodes`), {
-                ...formData,
-                uploadDate: serverTimestamp(),
-            });
+            await apiPost(`/api/dramas/${selectedDrama}/episodes`, formData);
             setMessage("✅ Epizod muvaffaqiyatli qo‘shildi!");
+            setToast({ open: true, msg: "Epizod qo'shildi", type: "success" });
             setFormData({
                 episode: "",
                 season: "",
@@ -62,12 +65,14 @@ export default function AdminAddEpisode() {
         } catch (error) {
             console.error("Xato:", error);
             setMessage("❌ Xatolik yuz berdi!");
+            setToast({ open: true, msg: "Xatolik yuz berdi", type: "error" });
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        <>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-white to-blue-50 p-6">
             <div className="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
                 <h2 className="text-3xl font-extrabold text-center text-blue-700 mb-6">
@@ -138,5 +143,16 @@ export default function AdminAddEpisode() {
                 )}
             </div>
         </div>
+        <Snackbar
+            open={toast.open}
+            autoHideDuration={3000}
+            onClose={() => setToast((t) => ({ ...t, open: false }))}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+            <Alert severity={toast.type} sx={{ width: '100%' }}>
+                {toast.msg}
+            </Alert>
+        </Snackbar>
+        </>
     );
 }

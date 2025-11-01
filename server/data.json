@@ -1,0 +1,40 @@
+{
+  "dramas": [
+    {
+      "id": "i5tsjcl8",
+      "title": "Romantik roman",
+      "description": "Yosh Ha Yun o'zining 100 kunlik yubileyi oldidan kutilmagan ajralish bilan duch keladi. O'z munosabatlari uchun kurashishga qaror qilgan, u taqdirini tan olishni rad etadi, chunki Nam Tae Ryun uni tark etadi.",
+      "thumbnail": "https://lh3.googleusercontent.com/proxy/NlrHRyNaAoHW_Z86ZFHLuOFiaSh2s0VHLoUA9h-Yobi_Fr8PIHJucUKrNjVTaN-7XYcHVverfC6XIO0HUWJYtMYzMmTJKjFnh3C3",
+      "lang": "UZ",
+      "uploadDate": "2025-11-01T19:01:04.952Z",
+      "episodes": [
+        {
+          "id": "ieiiceui",
+          "season": "1",
+          "episode": "1",
+          "videoId": "88375b60-92eb-41ec-9ba9-eb249614d840",
+          "uploadDate": "2025-11-01T19:05:26.230Z"
+        },
+        {
+          "id": "txhnwvi4",
+          "season": "1",
+          "episode": "2",
+          "videoId": "732afbca-2501-470a-ae37-a302f6be2523",
+          "uploadDate": "2025-11-01T20:10:06.126Z"
+        }
+      ],
+      "likes": 1,
+      "likedBy": [
+        "ns6EsI0X8aehaU9S71URnJeR8FN2"
+      ],
+      "comments": [
+        {
+          "id": "qaolocqf",
+          "user": "Anon",
+          "text": "aa",
+          "createdAt": "2025-11-01T19:50:53.249Z"
+        }
+      ]
+    }
+  ]
+}

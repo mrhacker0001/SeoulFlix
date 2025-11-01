@@ -12,6 +12,8 @@ import Footer from "./Components/Footer";
 import HelpPage from "./Kdramas/HelpPage";
 import AdminAddDrama from "./Admin/AdminAddDrama";
 import AdminAddEpisode from "./Admin/AdminAddEpisode";
+import AdminManage from "./Admin/AdminManage";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   return (
@@ -26,8 +28,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dramalist" element={<DramaList />} />
           <Route path="/drama/:id" element={<DramaPage />} />
-          <Route path="/admin/drama" element={<AdminAddDrama />} />
-          <Route path="/admin/episode" element={<AdminAddEpisode />} />
+          <Route path="/admin/drama" element={<ProtectedRoute><AdminAddDrama /></ProtectedRoute>} />
+          <Route path="/admin/episode" element={<ProtectedRoute><AdminAddEpisode /></ProtectedRoute>} />
+          <Route path="/admin/manage" element={<ProtectedRoute><AdminManage /></ProtectedRoute>} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />

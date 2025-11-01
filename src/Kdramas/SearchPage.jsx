@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebaseConfig";
 import {
     Container,
     TextField,
@@ -12,23 +10,27 @@ import {
     CardActionArea,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { apiGet } from "../api";
 
 export default function SearchPage() {
     const [query, setQuery] = useState("");
-    const [dramas, setDramas] = useState([]);
+    const [results, setResults] = useState([]);
     const navigate = useNavigate();
-
-    const filtered = dramas.filter((d) =>
-        d.title.toLowerCase().includes(query.toLowerCase())
-    );
 
     useEffect(() => {
         const fetchData = async () => {
-            const querySnapshot = await getDocs(collection(db, "dramas"));
-            setDramas(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            if (query.trim() === "") return;
+            try {
+                const data = await apiGet(`/api/search?q=${encodeURIComponent(query)}`);
+                setResults(data || []);
+            } catch (e) {
+                console.error(e);
+            }
         };
-        fetchData();
-    }, []);
+
+        const timer = setTimeout(fetchData, 500); // 0.5 soniya kechiktirish
+        return () => clearTimeout(timer);
+    }, [query]);
 
     const handleClick = (id) => {
         navigate(`/drama/${id}`);
@@ -38,7 +40,7 @@ export default function SearchPage() {
         <Container sx={{ mt: 4 }}>
             <TextField
                 fullWidth
-                label="Dramani qidiring..."
+                label="Film yoki drama nomini yozing..."
                 variant="outlined"
                 sx={{ mb: 4 }}
                 value={query}
@@ -46,18 +48,23 @@ export default function SearchPage() {
             />
 
             <Grid container spacing={3}>
-                {filtered.map((drama) => (
-                    <Grid item xs={12} sm={6} md={4} key={drama.id}>
+                {results.map((movie) => (
+                    <Grid item xs={12} sm={6} md={4} key={movie.id}>
                         <Card sx={{ bgcolor: "background.paper" }}>
-                            <CardActionArea onClick={() => handleClick(drama.id)}>
+                            <CardActionArea onClick={() => handleClick(movie.id)}>
                                 <CardMedia
                                     component="img"
                                     height="200"
-                                    image={drama.thumbnail}
-                                    alt={drama.title}
+                                    image={movie.thumbnail || "https://via.placeholder.com/500x750?text=No+Image"}
+                                    alt={movie.title}
                                 />
                                 <CardContent>
-                                    <Typography variant="h6">{drama.title}</Typography>
+                                    <Typography variant="h6">
+                                        {movie.title || movie.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {movie.uploadDate ? new Date(movie.uploadDate).toLocaleDateString() : "Sana noma’lum"}
+                                    </Typography>
                                 </CardContent>
                             </CardActionArea>
                         </Card>
@@ -67,3 +74,4 @@ export default function SearchPage() {
         </Container>
     );
 }
+

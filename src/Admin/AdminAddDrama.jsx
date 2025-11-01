@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { apiPost } from "../api";
+import { Snackbar, Alert } from "@mui/material";
 
 export default function AdminAddDrama() {
     const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ export default function AdminAddDrama() {
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [toast, setToast] = useState({ open: false, msg: "", type: "success" });
 
     const handleChange = (e) => {
         setFormData({
@@ -25,11 +26,16 @@ export default function AdminAddDrama() {
         setMessage("");
 
         try {
-            await addDoc(collection(db, "dramas"), {
-                ...formData,
-                uploadDate: serverTimestamp(),
-            });
+            // basic validation
+            if (!formData.title.trim() || !formData.description.trim() || !formData.thumbnail.trim()) {
+                throw new Error("Maydonlar to'liq to'ldirilishi kerak");
+            }
+            const urlOk = /^(https?:\/\/).+/.test(formData.thumbnail.trim());
+            if (!urlOk) throw new Error("Rasm URL noto'g'ri formatda");
+
+            await apiPost('/api/dramas', formData);
             setMessage("✅ Drama muvaffaqiyatli qo‘shildi!");
+            setToast({ open: true, msg: "Drama qo'shildi", type: "success" });
             setFormData({
                 title: "",
                 description: "",
@@ -39,12 +45,14 @@ export default function AdminAddDrama() {
         } catch (error) {
             console.error("Xato:", error);
             setMessage("❌ Xatolik yuz berdi!");
+            setToast({ open: true, msg: error.message || "Xatolik yuz berdi", type: "error" });
         } finally {
             setLoading(false);
         }
     };
 
     return (
+        <>
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-indigo-50 p-6">
             <div className="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
                 <h2 className="text-3xl font-extrabold text-center text-indigo-700 mb-6">
@@ -107,6 +115,17 @@ export default function AdminAddDrama() {
                 )}
             </div>
         </div>
+        <Snackbar
+            open={toast.open}
+            autoHideDuration={3000}
+            onClose={() => setToast((t) => ({ ...t, open: false }))}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+            <Alert severity={toast.type} sx={{ width: '100%' }}>
+                {toast.msg}
+            </Alert>
+        </Snackbar>
+        </>
     );
 }
 

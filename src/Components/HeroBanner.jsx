@@ -33,49 +33,53 @@ export default function HeroBanner({ banners }) {
                             overflow: "hidden",
                         }}
                     >
-                        {/* Overlay */}
-                        <Box
-                            sx={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: "100%",
-                                // backgroundColor: "rgba(0, 0, 0, 0.45)",
-                            }}
-                        />
 
-                        {/* Matn joyi */}
-                        <Box
-                            sx={{
-                                position: "absolute",
-                                bottom: { xs: "20px", sm: "40px" },
-                                left: { xs: "20px", sm: "50px" },
-                                color: "white",
-                                // zIndex: 2,
-                            }}
-                        >
-                            <Typography
-                                variant="h4"
+                        <a href="https://t.me/seoulflix_official">
+                            {/* Overlay */}
+                            <Box
                                 sx={{
-                                    fontWeight: "bold",
-                                    fontSize: { xs: "1rem", sm: "1.5rem" },
-                                    textShadow: "2px 2px 5px rgba(0,0,0,0.6)",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    width: "100%",
+                                    height: "100%",
+                                    // backgroundColor: "rgba(0, 0, 0, 0.45)",
+                                }}
+                            />
+
+                            {/* Matn joyi */}
+                            <Box
+                                sx={{
+                                    position: "absolute",
+                                    bottom: { xs: "20px", sm: "40px" },
+                                    left: { xs: "20px", sm: "50px" },
+                                    color: "white",
+                                    // zIndex: 2,
                                 }}
                             >
-                                {banner.title}
-                            </Typography>
-                            <Typography
-                                variant="subtitle1"
-                                sx={{
-                                    mt: 1,
-                                    fontSize: { xs: "0.9rem", sm: "1rem" },
-                                    textShadow: "1px 1px 4px rgba(0,0,0,0.5)",
-                                }}
-                            >
-                                {banner.subtitle}
-                            </Typography>
-                        </Box>
+                                <Typography
+                                    variant="h4"
+                                    sx={{
+                                        fontWeight: "bold",
+                                        fontSize: { xs: "1rem", sm: "1.5rem" },
+                                        textShadow: "2px 2px 5px rgba(0,0,0,0.6)",
+                                    }}
+                                >
+                                    {banner.title}
+                                </Typography>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        mt: 1,
+                                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                                        textShadow: "1px 1px 4px rgba(0,0,0,0.5)",
+                                    }}
+
+                                >
+                                    {banner.subtitle}
+                                </Typography>
+                            </Box>
+                        </a>
                     </Box>
                 ))}
             </Slider>
