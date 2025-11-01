@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { apiGet } from "../api";
+import { apiGet, apiPost } from "../api";
 import {
     Box,
     Typography,
@@ -68,19 +68,14 @@ export default function DramaPage() {
             return;
         }
         try {
-            const res = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:4000'}/api/dramas/${id}/like`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: user.uid })
-            });
-            if (res.status === 409) {
+            const res = await apiPost(`/api/dramas/${id}/like`, { userId: user.uid });
+            // api returns 200 with likes count or error; 409 was used previously, but apiPost throws on non-2xx
+            if (res?.error === 'Already liked') {
                 setToast({ open: true, msg: "Siz allaqachon yoqtirgansiz", type: "info" });
                 setLiked(true);
                 return;
             }
-            if (!res.ok) throw new Error();
-            const data = await res.json();
-            setLikes(data.likes || 0);
+            setLikes(res.likes || 0);
             setLiked(true);
         } catch (e) {
             setToast({ open: true, msg: "Like yuborishda xatolik", type: "error" });
@@ -99,13 +94,7 @@ export default function DramaPage() {
             return;
         }
         try {
-            const res = await fetch(`${process.env.REACT_APP_API_BASE || 'http://localhost:4000'}/api/dramas/${id}/comments`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, user: user.displayName || user.email })
-            });
-            if (!res.ok) throw new Error();
-            const c = await res.json();
+            const c = await apiPost(`/api/dramas/${id}/comments`, { text, user: user.displayName || user.email });
             setComments(prev => [c, ...prev]);
             setCommentText("");
             setToast({ open: true, msg: "Izoh qo'shildi", type: "success" });

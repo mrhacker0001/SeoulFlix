@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { apiGet } from '../api';
+import { apiGet, apiPut, apiDelete } from '../api';
 import {
   Box,
   Typography,
@@ -20,7 +20,7 @@ export default function AdminManage() {
   const [form, setForm] = useState({ title: '', description: '', thumbnail: '', lang: '' });
   const [toast, setToast] = useState({ open: false, msg: '', type: 'success' });
 
-  const API_BASE = process.env.REACT_APP_API_BASE || 'http://localhost:4000';
+  
 
   const load = async () => {
     try {
@@ -52,12 +52,7 @@ export default function AdminManage() {
         setToast({ open: true, msg: "Maydonlar to'liq to'ldirilishi kerak", type: 'warning' });
         return;
       }
-      const res = await fetch(`${API_BASE}/api/dramas/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) throw new Error('save failed');
+      await apiPut(`/api/dramas/${id}`, form);
       setToast({ open: true, msg: 'Saqlandi', type: 'success' });
       cancelEdit();
       await load();
@@ -69,8 +64,7 @@ export default function AdminManage() {
   const removeDrama = async (id) => {
     if (!window.confirm('Ushbu dramani o\'chirasizmi?')) return;
     try {
-      const res = await fetch(`${API_BASE}/api/dramas/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('delete failed');
+      await apiDelete(`/api/dramas/${id}`);
       setToast({ open: true, msg: 'O\'chirildi', type: 'success' });
       await load();
     } catch (e) {
