@@ -1,0 +1,19 @@
+[
+    {
+        "origin": [
+            "http://localhost:3001",
+            "https://kinobot-cb801.web.app"
+        ],
+        "method": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+        ],
+        "maxAgeSeconds": 3600,
+        "responseHeader": [
+            "Content-Type",
+            "x-goog-meta-foo"
+        ]
+    }
+]
