@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
 import {
@@ -28,6 +28,8 @@ import {
 } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { onAuthStateChanged } from "firebase/auth";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 
 export default function DramaPage() {
     const { id } = useParams();
@@ -42,6 +44,9 @@ export default function DramaPage() {
     const [ratingAvgMap, setRatingAvgMap] = useState({});
     const [ratingCountMap, setRatingCountMap] = useState({});
     const [userRatingMap, setUserRatingMap] = useState({});
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -179,7 +184,7 @@ export default function DramaPage() {
     }, [user, id, episodes.length]);
 
     const handleLike = async (epId) => {
-        if (!user) return alert("Avval tizimga kiring!");
+        if (!user) return alert(langData.loginFirst);
 
         const likeRef = doc(db, "dramas", id, "episodes", epId, "likes", user.uid);
         const likeSnap = await getDoc(likeRef);
@@ -194,7 +199,7 @@ export default function DramaPage() {
     };
 
     const handleRateChange = async (epId, value) => {
-        if (!user) return alert("Baholash uchun tizimga kiring!");
+        if (!user) return alert(langData.loginToRate);
         if (!value) return;
         try {
             const ratingRef = doc(db, "dramas", id, "episodes", epId, "ratings", user.uid);
@@ -206,7 +211,8 @@ export default function DramaPage() {
     };
 
     const handleAddComment = async (epId) => {
-        if (!user) return alert("Komment yozish uchun tizimga kiring!");
+        if (!user) return alert(langData.loginToComment);
+
         const text = commentTextMap[epId]?.trim();
         if (!text) return;
 
@@ -230,7 +236,7 @@ export default function DramaPage() {
     if (!drama)
         return (
             <Typography align="center" color="error" mt={5}>
-                Drama topilmadi ❌
+                {langData.dramaNotFound}
             </Typography>
         );
 
@@ -256,7 +262,7 @@ export default function DramaPage() {
                         variant={expandedEpisode === ep.id ? "contained" : "outlined"}
                         onClick={() => setExpandedEpisode(ep.id)}
                     >
-                        {`Qism ${ep.episodeNumber || ep.episode}`}
+                        {`${langData.episode} ${ep.episodeNumber || ep.episode}`}
                     </Button>
                 ))}
             </Box>
@@ -269,10 +275,7 @@ export default function DramaPage() {
                             key={ep.id}
                             sx={{ width: "100%", maxWidth: 900, mx: "auto", mb: 4 }}
                         >
-                            <Typography variant="h6" mb={1}>
-                                {ep.title || `Qism ${ep.episode}`}
-                            </Typography>
-
+                            {ep.title || `${langData.episode} ${ep.episode}`}
                             {ep.videoId ? (
                                 <iframe
                                     width="100%"
@@ -287,7 +290,7 @@ export default function DramaPage() {
                                 ></iframe>
                             ) : (
                                 <Typography color="error" mt={2}>
-                                    Video ID topilmadi
+                                    {langData.videoNotFound}
                                 </Typography>
                             )}
 
@@ -310,11 +313,14 @@ export default function DramaPage() {
                                             sx={{ color: likesMap[ep.id] > 0 ? "red" : "gray" }}
                                         />
                                     </IconButton>
-                                    <Typography>{likesMap[ep.id] || 0} ta like</Typography>
+                                    <Typography>
+                                        {likesMap[ep.id] || 0} {langData.likeCount}
+                                    </Typography>
+
                                 </Box>
 
                                 <Typography color="text.secondary">
-                                    👁️ {ep.views || 0} ta ko‘rish
+                                    👁️ {ep.views || 0} {langData.views}
                                 </Typography>
 
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -334,7 +340,7 @@ export default function DramaPage() {
                             <Box sx={{ mt: 2 }}>
                                 <Divider sx={{ mb: 2 }} />
                                 <Typography variant="h6" gutterBottom>
-                                    Fikr qoldiring 💬
+                                    {langData.leaveComment}
                                 </Typography>
 
                                 <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
@@ -342,7 +348,7 @@ export default function DramaPage() {
                                         fullWidth
                                         variant="outlined"
                                         size="small"
-                                        placeholder="Komment yozing..."
+                                        placeholder={langData.leaveComment}
                                         value={commentTextMap[ep.id] || ""}
                                         onChange={(e) =>
                                             setCommentTextMap((prev) => ({
@@ -352,7 +358,7 @@ export default function DramaPage() {
                                         }
                                     />
                                     <Button variant="contained" onClick={() => handleAddComment(ep.id)}>
-                                        Yuborish
+                                        {langData.send}
                                     </Button>
                                 </Box>
 
@@ -370,7 +376,7 @@ export default function DramaPage() {
                                     ))
                                 ) : (
                                     <Typography variant="body2" color="text.secondary" mt={1}>
-                                        Hozircha fikrlar yo‘q
+                                        {langData.noComments}
                                     </Typography>
                                 )}
                             </Box>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db, auth } from "../firebaseConfig";
 import {
@@ -14,6 +14,9 @@ import {
     Rating,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
+
 
 export default function DramaList() {
     const [dramas, setDramas] = useState([]);
@@ -21,7 +24,9 @@ export default function DramaList() {
     const [alertOpen, setAlertOpen] = useState(false);
     const [ratingAvgMap, setRatingAvgMap] = useState({});
     const [ratingCountMap, setRatingCountMap] = useState({});
-    const navigate = useNavigate();
+    const navigate = useNavigate(); const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -73,10 +78,8 @@ export default function DramaList() {
     };
 
     const targetGenres = ["Drama", "Comedy",];
-    const genreTitles = {
-        Drama: "Mashhur dramalar",
-        Comedy: "Mashhur komediyalar",
-    };
+    const genreTitles = langData.genreTitles;
+
 
     const getTopByGenre = (genre) => {
         const list = dramas.filter(
@@ -141,12 +144,14 @@ export default function DramaList() {
                         </Typography>
 
                         <Typography variant="body2" color="text.secondary">
-                            🌐 Til: {drama.lang?.toUpperCase() || "Noma’lum"}
+                            🌐 {langData.language}: {drama.lang?.toUpperCase() || langData.unknown}
+
                         </Typography>
 
                         {Array.isArray(drama.genres) && drama.genres.length > 0 && (
                             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                                🏷 Janrlar: {drama.genres.join(", ")}
+                                🏷 {langData.genres}: {drama.genres.join(", ")}
+
                             </Typography>
                         )}
 
@@ -157,7 +162,7 @@ export default function DramaList() {
                                 display="block"
                                 mt={1}
                             >
-                                Yuklangan sana:{" "}
+                                {langData.uploadedDate}:{" "}
                                 {new Date(drama.uploadDate.seconds * 1000).toLocaleDateString(
                                     "en-US",
                                     {
@@ -192,7 +197,7 @@ export default function DramaList() {
                         sx={{ mt: 2, borderRadius: 2 }}
                         onClick={() => handleWatch(drama.id)}
                     >
-                        Tomosha qilish →
+                        {langData.watch}
                     </Button>
                 </CardContent>
             </Card>
@@ -223,8 +228,9 @@ export default function DramaList() {
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
                 <Alert severity="warning" sx={{ width: "100%" }}>
-                    Iltimos, avval profil yarating yoki tizimga kiring!
+                    {langData.loginRequired}
                 </Alert>
+
             </Snackbar>
         </Box>
     );

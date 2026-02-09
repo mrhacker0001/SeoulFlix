@@ -1,7 +1,13 @@
 // src/components/Footer.jsx
+import { useMemo } from "react";
 import { Box, Typography, Link, Grid } from "@mui/material";
+import locale from "../localization/locale.json";
+import { useStoreState } from "../Redux/selector";
+
 
 export default function Footer() {
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
     return (
         <Box
             sx={{
@@ -18,28 +24,28 @@ export default function Footer() {
                         🎬 SeoulFlix
                     </Typography>
                     <Typography variant="body2" color="gray">
-                        Siz sevgan dramalarni bir joyda tomosha qiling.
+                        {langData.favourite}
                     </Typography>
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
                     <Typography variant="h6" fontWeight="bold">
-                        Havolalar
+                        {langData.links}
                     </Typography>
                     <Link href="/" color="inherit" underline="hover" display="block">
-                        Bosh sahifa
+                        {langData.home}
                     </Link>
                     <Link href="/help" color="inherit" underline="hover" display="block">
-                        Yordam
+                        {langData.help}
                     </Link>
                     <Link href="/profile" color="inherit" underline="hover" display="block">
-                        Profil
+                        {langData.profile}
                     </Link>
                 </Grid>
 
                 <Grid item xs={12} sm={4}>
                     <Typography variant="h6" fontWeight="bold">
-                        Biz bilan bog‘laning
+                        {langData.contact}
                     </Typography>
                     <Typography variant="body2">
                         📧 <a href="https://t.me/seoulflix_admin" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }}>
@@ -63,7 +69,7 @@ export default function Footer() {
                 textAlign="center"
                 mt={3}
             >
-                © {new Date().getFullYear()} SeoulFlix — Barcha huquqlar himoyalangan.
+                © {new Date().getFullYear()} SeoulFlix — {langData.reserve}
             </Typography>
         </Box>
     );

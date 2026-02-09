@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
     AppBar,
     Toolbar,
@@ -11,15 +11,24 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
+    MenuItem,
+    Select
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
+import { useDispatch } from "react-redux";
+import { setLang } from "../Redux/lang";
 
 export default function Navbar() {
     const [user, setUser] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const auth = getAuth();
@@ -35,14 +44,14 @@ export default function Navbar() {
 
     // Menu ichidagi linklar (mobile drawer)
     const drawerLinks = [
-        { text: "Bosh sahifa", to: "/" },
-        { text: "Yordam", to: "/help" },
-        { text: "Murojaat", to: "/require" },
+        { text: langData.home, to: "/" },
+        { text: langData.help, to: "/help" },
+        { text: langData.adress, to: "/require" },
         ...(user
             ? [] // Profil va Search alohida, Drawerda emas
             : [
-                { text: "Kirish", to: "/signin" },
-                { text: "Ro‘yxatdan o‘tish", to: "/signup" },
+                { text: langData.login, to: "/signin" },
+                { text: langData.register, to: "/signup" },
             ]),
     ];
 
@@ -65,17 +74,43 @@ export default function Navbar() {
                     {/* Desktop menu */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
                         <Button color="inherit" component={Link} to="/">
-                            Bosh sahifa
+                            {langData.home}
                         </Button>
                         <IconButton color="inherit" component={Link} to="/search">
                             <SearchIcon />
                         </IconButton>
                         <Button color="inherit" component={Link} to="/help">
-                            Yordam
+                            {langData.help}
                         </Button>
                         <Button color="inherit" component={Link} to="/require">
-                            Murojaat
+                            {langData.adress}
                         </Button>
+                        <Select
+                            size="small"
+                            value={states.lang}
+                            onChange={(e) => dispatch(setLang(e.target.value))}
+                            sx={{
+                                color: "white",
+                                borderRadius: 2,
+                                height: 36,
+                                '.MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'rgba(255,255,255,0.6)',
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'white',
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'white',
+                                },
+                                '.MuiSvgIcon-root': {
+                                    color: 'white',
+                                }
+                            }}
+                        >
+                            <MenuItem value="uz">UZ</MenuItem>
+                            <MenuItem value="en">EN</MenuItem>
+                        </Select>
+
                         {user ? (
                             <Button
                                 color="inherit"
@@ -104,7 +139,7 @@ export default function Navbar() {
                                         },
                                     }}
                                 >
-                                    Kirish
+                                    {langData.login}
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -120,7 +155,7 @@ export default function Navbar() {
                                         '&:hover': { bgcolor: "#b20710", boxShadow: "none" },
                                     }}
                                 >
-                                    Ro‘yxatdan o‘tish
+                                    {langData.register}
                                 </Button>
                             </>
                         )}
@@ -128,6 +163,31 @@ export default function Navbar() {
 
                     {/* Mobile menu */}
                     <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1 }}>
+                        <Select
+                            size="small"
+                            value={states.lang}
+                            onChange={(e) => dispatch(setLang(e.target.value))}
+                            sx={{
+                                color: "white",
+                                borderRadius: 2,
+                                height: 36,
+                                '.MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'rgba(255,255,255,0.6)',
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'white',
+                                },
+                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: 'white',
+                                },
+                                '.MuiSvgIcon-root': {
+                                    color: 'white',
+                                }
+                            }}
+                        >
+                            <MenuItem value="uz">UZ</MenuItem>
+                            <MenuItem value="en">EN</MenuItem>
+                        </Select>
                         {/* Search icon har doim ko‘rinadi */}
                         <IconButton color="inherit" component={Link} to="/search">
                             <SearchIcon />

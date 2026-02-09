@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import navbarReducer from './navbarSlice';
 import userReducer from './userSlice';
+import lang from "./lang"
 
 const persistConfig = {
     key: 'root',
@@ -13,6 +14,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
     navbar: navbarReducer,
     user: userReducer,
+    lang,
 });
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
     Box,
     Button,
@@ -11,6 +11,8 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 
 const SignUpPage = () => {
     const [email, setEmail] = useState("");
@@ -20,6 +22,9 @@ const SignUpPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+
 
     // Validation regex
     const gmailRegex = /^[A-Za-z0-9._%+-]+@gmail\.com$/;
@@ -33,11 +38,11 @@ const SignUpPage = () => {
         try {
             // Client-side validation before Firebase call
             if (!isEmailValid) {
-                setError("Faqat @gmail.com manzili qabul qilinadi");
+                setError(langData.onlygmail);
                 return;
             }
             if (!isPhoneValid) {
-                setError("Telefon raqami +998 bilan boshlanib 9 ta raqamdan iborat bo'lishi kerak");
+                setError(langData.requiredphone);
                 return;
             }
             // 🔹 Firebase Authentication orqali foydalanuvchini yaratish
@@ -69,7 +74,7 @@ const SignUpPage = () => {
                 <Typography variant="h5" mb={2}>Sign Up</Typography>
 
                 <TextField
-                    label="Ism"
+                    label={langData.name}
                     fullWidth
                     margin="normal"
                     value={name}
@@ -77,7 +82,7 @@ const SignUpPage = () => {
                 />
 
                 <TextField
-                    label="Telefon raqam"
+                    label={langData.phone}
                     fullWidth
                     margin="normal"
                     type="tel"
@@ -86,11 +91,11 @@ const SignUpPage = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     inputProps={{ pattern: "^\\+998\\d{9}$" }}
                     error={phone.length > 0 && !isPhoneValid}
-                    helperText={phone.length > 0 && !isPhoneValid ? "+998 bilan boshlanib 9 ta raqam kiriting (masalan, +998901234567)" : ""}
+                    helperText={phone.length > 0 && !isPhoneValid ? langData.requiredphone : ""}
                 />
 
                 <TextField
-                    label="Email"
+                    label={langData.email}
                     fullWidth
                     margin="normal"
                     type="email"
@@ -98,11 +103,11 @@ const SignUpPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     inputProps={{ pattern: "^[A-Za-z0-9._%+-]+@gmail\\.com$" }}
                     error={email.length > 0 && !isEmailValid}
-                    helperText={email.length > 0 && !isEmailValid ? "Faqat @gmail.com email qabul qilinadi" : ""}
+                    helperText={email.length > 0 && !isEmailValid ? langData.onlygmail : ""}
                 />
 
                 <TextField
-                    label="Parol"
+                    label={langData.password}
                     fullWidth
                     margin="normal"
                     type="password"
@@ -129,11 +134,11 @@ const SignUpPage = () => {
                         !isPhoneValid
                     }
                 >
-                    {loading ? <CircularProgress size={24} /> : "Ro‘yxatdan o‘tish"}
+                    {loading ? <CircularProgress size={24} /> : langData.register}
                 </Button>
 
                 <Typography mt={2}>
-                    Allaqachon hisobingiz bormi? <Link to="/signin">Kirish</Link>
+                    {langData.havean} <Link to="/signin">{langData.signin}</Link>
                 </Typography>
             </Card>
         </Box>

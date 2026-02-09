@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
     Box,
     Button,
@@ -10,6 +10,8 @@ import {
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import { Link, useNavigate } from "react-router-dom";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 
 const SignInPage = () => {
     const [email, setEmail] = useState("");
@@ -17,6 +19,8 @@ const SignInPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
 
     const handleSignIn = async () => {
         setError("");
@@ -25,7 +29,7 @@ const SignInPage = () => {
             await signInWithEmailAndPassword(auth, email, password);
             navigate("/");
         } catch (err) {
-            setError("Email yoki parol noto‘g‘ri");
+            setError(langData.empasserror);
         } finally {
             setLoading(false);
         }
@@ -34,10 +38,10 @@ const SignInPage = () => {
     return (
         <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
             <Card sx={{ p: 4, width: 400, textAlign: "center" }}>
-                <Typography variant="h5" mb={2}>Sign In</Typography>
+                <Typography variant="h5" mb={2}>{langData.signin}</Typography>
 
                 <TextField
-                    label="Email"
+                    label={langData.email}
                     fullWidth
                     margin="normal"
                     type="email"
@@ -45,7 +49,7 @@ const SignInPage = () => {
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <TextField
-                    label="Password"
+                    label={langData.password}
                     fullWidth
                     margin="normal"
                     type="password"
@@ -66,11 +70,11 @@ const SignInPage = () => {
                     onClick={handleSignIn}
                     disabled={loading}
                 >
-                    {loading ? <CircularProgress size={24} /> : "Sign In"}
+                    {loading ? <CircularProgress size={24} /> : langData.signin}
                 </Button>
 
                 <Typography mt={2}>
-                    Don’t have an account? <Link to="/signup">Sign Up</Link>
+                    {langData.noaccount} <Link to="/signup">{langData.register}</Link>
                 </Typography>
             </Card>
         </Box>

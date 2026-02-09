@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 import {
     getAuth,
     updatePassword,
@@ -16,6 +18,7 @@ import {
     getFirestore,
     doc,
     getDoc,
+    updateDoc
 } from "firebase/firestore";
 import {
     Button,
@@ -27,7 +30,7 @@ import {
     Paper,
     CircularProgress,
 } from "@mui/material";
-
+import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 const modalStyle = {
     position: "absolute",
     top: "50%",
@@ -39,6 +42,7 @@ const modalStyle = {
     boxShadow: 24,
     p: 4,
 };
+
 
 export default function Profile() {
     const auth = getAuth();
@@ -52,6 +56,9 @@ export default function Profile() {
     const [open, setOpen] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(true);
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+
 
     // 🔹 Auth o‘zgarishini kuzatish
     useEffect(() => {
@@ -81,22 +88,40 @@ export default function Profile() {
 
     const handlePhotoUpload = async () => {
         if (!photo || !user) return;
+        if (photo.size > 2 * 1024 * 1024) {
+            alert(langData.photoerror);
+            return;
+        }
+        if (!photo.type.startsWith("image/")) {
+            alert(langData.onlyphoto);
+            return;
+        }
+
         try {
             const storageRef = ref(storage, `profilePhotos/${user.uid}`);
             await uploadBytes(storageRef, photo);
             const url = await getDownloadURL(storageRef);
             await updateProfile(user, { photoURL: url });
+            await updateDoc(doc(db, "users", user.uid), {
+                photoURL: url
+            });
             setPreview(url);
-            alert("Profil rasmi muvaffaqiyatli yangilandi ✅");
+            alert(langData.uploadSuccess);
         } catch (err) {
             alert("Xatolik: " + err.message);
         }
     };
 
+
+
     const handlePasswordUpdate = async () => {
+        if (newPassword.length < 6) {
+            alert(langData.passwordShort);
+            return;
+        }
         try {
             await updatePassword(auth.currentUser, newPassword);
-            alert("Parol muvaffaqiyatli yangilandi ✅");
+            alert(langData.passwordsuccess);
             setOpen(false);
             setNewPassword("");
         } catch (error) {
@@ -120,7 +145,7 @@ export default function Profile() {
     if (!user) {
         return (
             <Typography align="center" mt={5}>
-                Foydalanuvchi tizimga kirmagan 😢
+                {langData.notlogin}
             </Typography>
         );
     }
@@ -147,7 +172,8 @@ export default function Profile() {
                 }}
             >
                 <Typography variant="h5" fontWeight="bold" gutterBottom>
-                    👤 Shaxsiy profil
+                    👤 {langData.profile}
+
                 </Typography>
 
                 <label htmlFor="upload-photo">
@@ -178,20 +204,21 @@ export default function Profile() {
                         onClick={handlePhotoUpload}
                         sx={{ mb: 2 }}
                     >
-                        📤 Yuklash
+                        📤 {langData.upload}
+
                     </Button>
                 )}
 
                 <Typography variant="body1" sx={{ mt: 1 }}>
-                    <strong>Ism:</strong> {userData?.name || user.displayName || "—"}
+                    <strong>{langData.name}</strong> {userData?.name || user.displayName || "—"}
                 </Typography>
 
                 <Typography variant="body1" sx={{ mt: 1 }}>
-                    <strong>Email:</strong> {user.email}
+                    <strong>{langData.email}</strong> {user.email}
                 </Typography>
 
                 <Typography variant="body1" sx={{ mt: 1 }}>
-                    <strong>Telefon raqam:</strong> {userData?.phone || "—"}
+                    <strong>{langData.phone1}</strong> {userData?.phone || "—"}
                 </Typography>
 
                 <Button
@@ -199,7 +226,8 @@ export default function Profile() {
                     sx={{ mt: 3 }}
                     onClick={() => setOpen(true)}
                 >
-                    🔒 Parolni o‘zgartirish
+                    🔒 {langData.changePassword}
+
                 </Button>
 
                 <Button
@@ -208,13 +236,15 @@ export default function Profile() {
                     sx={{ mt: 2 }}
                     onClick={handleLogout}
                 >
-                    🚪 Chiqish
+                    🚪 {langData.logout}
+
                 </Button>
 
                 <Modal open={open} onClose={() => setOpen(false)}>
                     <Box sx={modalStyle}>
                         <Typography variant="h6" mb={2}>
-                            Yangi parol kiriting
+                            {langData.enterNewPassword}
+
                         </Typography>
                         <TextField
                             type="password"
@@ -229,7 +259,7 @@ export default function Profile() {
                             fullWidth
                             onClick={handlePasswordUpdate}
                         >
-                            Tasdiqlash
+                            {langData.submit}
                         </Button>
                     </Box>
                 </Modal>

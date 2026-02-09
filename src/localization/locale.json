@@ -1,0 +1,209 @@
+{
+    "uz": {
+        "home": "Bosh sahifa",
+        "help": "Yordam",
+        "adress": "Bog'lanish",
+        "login": "Kirish",
+        "register": "Ro'yxatdan o'tish",
+        "favourite": "Siz sevgan dramalarni bir joyda tomosha qiling.",
+        "links": "Havolalar",
+        "profile": "Profil",
+        "contact": "Biz bilan bog'laning",
+        "reserve": "Barcha huquqlar himoyalangan.",
+        "ads": "BU YERDA SIZNING REKLAMANGIZ BO‘LISHI MUMKIN",
+        "cooperate": "Biz bilan hamkorlik qiling!",
+        "search": "Dramani qidiring...",
+        "helpCenter": "🆘 Yordam markazi",
+        "helpSubtitle": "Quyidagi savollar orqali saytdan foydalanishni o‘rganing 👇",
+        "faqs": [
+            {
+                "question": "SeoulFlix nima?",
+                "answer": "SeoulFlix — bu siz sevadigan koreys dramalarini tomosha qilish, ularga like bosish va fikr bildirish imkonini beruvchi platforma."
+            },
+            {
+                "question": "Qanday qilib tizimga kiraman yoki ro‘yxatdan o‘taman?",
+                "answer": "Sahifaning yuqori o‘ng burchagidagi 'Kirish' yoki 'Ro‘yxatdan o‘tish' tugmalaridan foydalaning. Siz Google yoki email orqali hisob yaratishingiz mumkin."
+            },
+            {
+                "question": "Dramalarga qanday qilib like bosaman?",
+                "answer": "Video sahifasida yurak belgisi mavjud. Bosish orqali like berasiz."
+            },
+            {
+                "question": "Fikr (komment) qoldirish uchun nima qilish kerak?",
+                "answer": "Komment yozish uchun siz tizimga kirgan bo‘lishingiz kerak. Keyin video ostidagi matn maydoniga yozib, 'Yuborish' tugmasini bosing."
+            },
+            {
+                "question": "Boshqa foydalanuvchilar kommentlarimni ko‘ra oladimi?",
+                "answer": "Ha, barcha foydalanuvchilar sizning kommentingizni real vaqt rejimida ko‘rishlari mumkin."
+            },
+            {
+                "question": "Qanday qilib qo‘llab-quvvatlash xizmatiga murojaat qilaman?",
+                "answer": "Agar sizda muammo bo‘lsa, bizga Telegram orqali @seoulflix_admin bilan bog‘laning yoki +998 87 355 0024 raqamiga aloqaga chiqing."
+            },
+            {
+                "question": "Qanday qilib saytni qo'llab-quvvatlasak bo'ladi?",
+                "answer": "Bizni donat orqali qo‘llab-quvvatlashingiz mumkin.",
+                "link": "https://tirikchilik.uz/seoulflix"
+            },
+            {
+                "question": "Saytdagi filmlar kim tomonidan dublyaj qilinadi?",
+                "answer": "Saytdagi barcha filmlar va seriallar Minxo TV jamoasi tomonidan o‘zbek tiliga dublyaj qilinadi."
+            }
+        ],
+        "requireTitle": "Taklif yoki talab yuborish",
+        "requireSubtitle": "Bu yerda taklif yoki saytda mavjud bo'lmagan yoqtirgan dramangiz nomini yozib qoldirishingiz mumkin",
+        "name": "Ism",
+        "phone": "Telefon (+998xxxxxxxxx)",
+        "offer": "Taklif",
+        "phoneHelper": "+998 bilan boshlanadigan 12 ta belgidan iborat bo‘lsin",
+        "formError": "Ma'lumotlarni to'g'ri kiriting",
+        "formSuccess": "Yuborildi",
+        "formFail": "Xatolik yuz berdi",
+        "watch": "Tomosha qilish →",
+        "loginRequired": "Iltimos, avval profil yarating yoki tizimga kiring!",
+        "language": "Til",
+        "genres": "Janrlar",
+        "uploadedDate": "Yuklangan sana",
+        "unknown": "Noma’lum",
+        "genreTitles": {
+            "Drama": "Mashhur dramalar",
+            "Comedy": "Mashhur komediyalar"
+        },
+        "episode": "Qism",
+        "videoNotFound": "Video ID topilmadi",
+        "likeCount": "ta like",
+        "views": "ta ko‘rish",
+        "leaveComment": "Fikr qoldiring 💬",
+        "writeComment": "Komment yozing...",
+        "send": "Yuborish",
+        "noComments": "Hozircha fikrlar yo‘q",
+        "loginFirst": "Avval tizimga kiring!",
+        "loginToRate": "Baholash uchun tizimga kiring!",
+        "loginToComment": "Komment yozish uchun tizimga kiring!",
+        "dramaNotFound": "Drama topilmadi ❌",
+        "upload": "Yuklash",
+        "changePassword": "Parolni o‘zgartirish",
+        "logout": "Chiqish",
+        "enterNewPassword": "Yangi parol kiriting",
+        "email": "Email",
+        "phone1": "Telefon raqam",
+        "passwordShort": "Parol kamida 6 ta belgidan iborat bo‘lishi kerak",
+        "uploadSuccess": "Profil rasmi muvaffaqiyatli yangilandi",
+        "userNotLogged": "Foydalanuvchi tizimga kirmagan",
+        "photoerror": "Rasm 2MB dan kichik bo‘lishi kerak",
+        "onlyphoto": "Faqat rasm yuklash mumkin",
+        "passwordsuccess": "Parol muvaffaqiyatli yangilandi ✅",
+        "notlogin": "Foydalanuvchi tizimga kirmagan 😢",
+        "submit": "Tasdiqlash",
+        "empaserror": "Email yoki parol noto‘g‘ri",
+        "signin": "Kirish",
+        "password": "Parol",
+        "noaccount": "Sizda hisob yo'qmi",
+        "onlygmail": "Faqat @gmail.com manzili qabul qilinadi",
+        "requiredphone": "Telefon raqami +998 bilan boshlanib 9 ta raqamdan iborat bo'lishi kerak",
+        "havean": "Allaqachon hisobingiz bormi?"
+    },
+    "en": {
+        "home": "Home",
+        "help": "Help",
+        "adress": "Contact",
+        "login": "Login",
+        "register": "Register",
+        "favourite": "Watch dramas that you liked in one place",
+        "links": "Links",
+        "profile": "Profile",
+        "contact": "Contact with us",
+        "reserve": "All rights reserved.",
+        "ads": "YOUR ADVERTISEMENT CAN BE HERE",
+        "cooperate": "Cooperate with us!",
+        "search": "Search drama...",
+        "helpCenter": "🆘 Help Center",
+        "helpSubtitle": "Learn how to use the site through the questions below 👇",
+        "faqs": [
+            {
+                "question": "What is SeoulFlix?",
+                "answer": "SeoulFlix is a platform where you can watch Korean dramas, like them and leave comments."
+            },
+            {
+                "question": "How can I sign in or register?",
+                "answer": "Use the 'Sign In' or 'Sign Up' buttons in the top right corner."
+            },
+            {
+                "question": "How do I like dramas?",
+                "answer": "There is a heart icon on the video page. Click to like."
+            },
+            {
+                "question": "How can I leave a comment?",
+                "answer": "You must be logged in to leave a comment. Then write your comment under the video and click 'Send'."
+            },
+            {
+                "question": "Can other users see my comments?",
+                "answer": "Yes, all users can see your comments in real time."
+            },
+            {
+                "question": "How can I contact support?",
+                "answer": "If you have any issues, contact us via Telegram @seoulflix_admin or call +998 87 355 0024."
+            },
+            {
+                "question": "How can I support the site?",
+                "answer": "You can support us via donation through tirikchilik.uz/seoulflix.",
+                "link": "https://tirikchilik.uz/seoulflix"
+            },
+            {
+                "question": "Who dubs the movies on the site?",
+                "answer": "All movies and series are dubbed into Uzbek by the Minxo TV team."
+            }
+        ],
+        "requireTitle": "Send request or suggestion",
+        "requireSubtitle": "Here you can write your suggestion or the name of a drama you like but is not on the site",
+        "name": "Name",
+        "phone": "Phone (+998xxxxxxxxx)",
+        "offer": "Suggestion",
+        "send": "Send",
+        "phoneHelper": "Must start with +998 and contain 12 characters",
+        "formError": "Please enter valid information",
+        "formSuccess": "Sent successfully",
+        "formFail": "Something went wrong",
+        "watch": "Watch →",
+        "loginRequired": "Please create a profile or login first!",
+        "language": "Language",
+        "genres": "Genres",
+        "uploadedDate": "Uploaded date",
+        "unknown": "Unknown",
+        "genreTitles": {
+            "Drama": "Popular dramas",
+            "Comedy": "Popular comedies"
+        },
+        "episode": "Episode",
+        "videoNotFound": "Video ID not found",
+        "likeCount": "likes",
+        "views": "views",
+        "leaveComment": "Leave a comment 💬",
+        "writeComment": "Write a comment...",
+        "noComments": "No comments yet",
+        "loginFirst": "Please login first!",
+        "loginToRate": "Login to rate!",
+        "loginToComment": "Login to comment!",
+        "dramaNotFound": "Drama not found ❌",
+        "upload": "Upload",
+        "changePassword": "Change password",
+        "logout": "Logout",
+        "enterNewPassword": "Enter new password",
+        "email": "Email",
+        "phone1": "Phone number",
+        "passwordShort": "Password must be at least 6 characters",
+        "uploadSuccess": "Profile photo updated successfully",
+        "photoerror": "Image must be smaller than 2MB.",
+        "onlyphoto": "Only images can be uploaded",
+        "passwordsuccess": "Password successfully updated ✅",
+        "notlogin": "User not logged in 😢",
+        "submit": "Submit",
+        "empaserror": "Incorrect email or password",
+        "signin": "Sign In",
+        "password": "Password",
+        "noaccount": "Don’t have an account?",
+        "onlygmail": "Only @gmail.com addresses are accepted.",
+        "requiredphone": "The phone number must start with +998 and consist of 9 digits.",
+        "havean":"Already have an account?"
+    }
+}

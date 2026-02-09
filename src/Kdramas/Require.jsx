@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Box, TextField, Button, Typography, Snackbar, Alert } from "@mui/material";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 
 export default function Require() {
     const [name, setName] = useState("");
@@ -10,16 +12,26 @@ export default function Require() {
     const [submitting, setSubmitting] = useState(false);
     const [alert, setAlert] = useState({ open: false, type: "success", message: "" });
 
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
+
     const uzPhoneOk = /^\+998\d{9}$/.test(phone.trim());
-    const canSubmit = name.trim().length >= 2 && uzPhoneOk && offer.trim().length >= 5 && !submitting;
+    const canSubmit =
+        name.trim().length >= 2 &&
+        uzPhoneOk &&
+        offer.trim().length >= 5 &&
+        !submitting;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (!canSubmit) {
-            setAlert({ open: true, type: "error", message: "Ma'lumotlarni to'g'ri kiriting" });
+            setAlert({ open: true, type: "error", message: langData.formError });
             return;
         }
+
         setSubmitting(true);
+
         try {
             await addDoc(collection(db, "requirements"), {
                 name: name.trim(),
@@ -27,12 +39,22 @@ export default function Require() {
                 offer: offer.trim(),
                 createdAt: new Date(),
             });
+
             setName("");
             setPhone("");
             setOffer("");
-            setAlert({ open: true, type: "success", message: "Yuborildi" });
+
+            setAlert({
+                open: true,
+                type: "success",
+                message: langData.formSuccess,
+            });
         } catch (err) {
-            setAlert({ open: true, type: "error", message: "Xatolik yuz berdi" });
+            setAlert({
+                open: true,
+                type: "error",
+                message: langData.formFail,
+            });
         } finally {
             setSubmitting(false);
         }
@@ -41,39 +63,59 @@ export default function Require() {
     return (
         <Box sx={{ p: 3, maxWidth: 500, mx: "auto" }}>
             <Typography variant="h5" align="center" fontWeight="bold" mb={2}>
-                Taklif yoki talab yuborish
+                {langData.requireTitle}
             </Typography>
-            <Typography variant="h5" align="center" fontWeight="400" color="#ababab" fontSize="14px" mb={2}>
-                bu yerda taklif yoki saytda mavjud bo'lmagan yoqtirgan daramangiz nomini yozib qoldirishingiz mumkin
+
+            <Typography
+                align="center"
+                color="#ababab"
+                fontSize="14px"
+                mb={2}
+            >
+                {langData.requireSubtitle}
             </Typography>
+
             <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gap: 2 }}>
                 <TextField
-                    label="Ism"
+                    label={langData.name}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                 />
+
                 <TextField
-                    label="Telefon (+998xxxxxxxxx)"
+                    label={langData.phone}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     error={phone.length > 0 && !uzPhoneOk}
-                    helperText={phone.length > 0 && !uzPhoneOk ? "+998 bilan boshlanadigan 12 ta belgidan iborat bo‘lsin" : " "}
+                    helperText={
+                        phone.length > 0 && !uzPhoneOk
+                            ? langData.phoneHelper
+                            : " "
+                    }
                     required
                 />
+
                 <TextField
-                    label="Taklif"
+                    label={langData.offer}
                     value={offer}
                     onChange={(e) => setOffer(e.target.value)}
                     multiline
                     minRows={4}
                     required
                 />
+
                 <Button type="submit" variant="contained" disabled={!canSubmit}>
-                    Jo'natish
+                    {langData.send}
                 </Button>
             </Box>
-            <Snackbar open={alert.open} autoHideDuration={3000} onClose={() => setAlert((a) => ({ ...a, open: false }))} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+
+            <Snackbar
+                open={alert.open}
+                autoHideDuration={3000}
+                onClose={() => setAlert((a) => ({ ...a, open: false }))}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            >
                 <Alert severity={alert.type} sx={{ width: "100%" }}>
                     {alert.message}
                 </Alert>
@@ -81,4 +123,3 @@ export default function Require() {
         </Box>
     );
 }
-

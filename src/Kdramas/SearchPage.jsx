@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import {
@@ -12,11 +12,15 @@ import {
     CardActionArea,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useStoreState } from "../Redux/selector";
+import locale from "../localization/locale.json";
 
 export default function SearchPage() {
     const [query, setQuery] = useState("");
     const [dramas, setDramas] = useState([]);
     const navigate = useNavigate();
+    const states = useStoreState();
+    const langData = useMemo(() => locale[states.lang], [states.lang]);
 
     const filtered = dramas.filter((d) =>
         d.title.toLowerCase().includes(query.toLowerCase())
@@ -38,7 +42,7 @@ export default function SearchPage() {
         <Container sx={{ mt: 4 }}>
             <TextField
                 fullWidth
-                label="Dramani qidiring..."
+                label={langData.search}
                 variant="outlined"
                 sx={{ mb: 4 }}
                 value={query}
