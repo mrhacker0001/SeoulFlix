@@ -30,7 +30,6 @@ import {
     Paper,
     CircularProgress,
 } from "@mui/material";
-import { EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 const modalStyle = {
     position: "absolute",
     top: "50%",

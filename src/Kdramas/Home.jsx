@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Container, Typography } from "@mui/material";
+import { Container } from "@mui/material";
 import DramaList from "./DramaList";
 import HeroBanner from "../Components/HeroBanner";
 import banner from "./reklama.jpeg";

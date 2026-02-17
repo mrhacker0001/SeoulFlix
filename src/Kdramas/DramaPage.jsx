@@ -133,7 +133,7 @@ export default function DramaPage() {
         };
 
         fetchDrama();
-    }, [id]);
+    }, [id, user]);
 
     // 🔹 Epizod ochilganda views ni 1 taga oshirish
     useEffect(() => {
@@ -181,7 +181,7 @@ export default function DramaPage() {
             }
         };
         fetchUserRatings();
-    }, [user, id, episodes.length]);
+    }, [user?.uid, id, episodes]);
 
     const handleLike = async (epId) => {
         if (!user) return alert(langData.loginFirst);
