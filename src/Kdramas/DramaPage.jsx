@@ -181,7 +181,7 @@ export default function DramaPage() {
             }
         };
         fetchUserRatings();
-    }, [user?.uid, id, episodes]);
+    }, [user, id, episodes]);
 
     const handleLike = async (epId) => {
         if (!user) return alert(langData.loginFirst);
