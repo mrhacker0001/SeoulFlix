@@ -57,7 +57,6 @@ export default function DramaList() {
         return unsubscribe;
     }, []);
 
-    // ---------------- RATING CALCULATOR (OPTIMIZED) ----------------
     useEffect(() => {
         if (!dramas.length) return;
 
@@ -143,7 +142,6 @@ export default function DramaList() {
             .slice(0, 8);
     };
 
-    // ---------------- CARD RENDER ----------------
     const renderDramaCard = (drama) => (
         <Grid item xs={12} sm={6} md={4} key={drama.id}>
             <Card
@@ -171,7 +169,7 @@ export default function DramaList() {
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "space-between",
-                        height: "100%",
+                        height: "auto",
                     }}
                 >
                     <Box>
