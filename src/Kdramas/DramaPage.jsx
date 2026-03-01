@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
+import { Plyr } from 'plyr-react';
+import 'plyr-react/plyr.css';
 import {
     collection,
     getDoc,
@@ -273,22 +275,24 @@ export default function DramaPage() {
                         >
                             {ep.title || `${langData.episode} ${ep.episode}`}
                             {ep.videoId ? (
-                                <iframe
-                                    width="100%"
-                                    height="500"
-                                    src={`https://www.youtube.com/embed/${ep.videoId}`}
-                                    title={ep.title}
-                                    allowFullScreen
-                                    style={{
-                                        borderRadius: "16px",
-                                        boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+                                <Plyr
+                                    source={{
+                                        type: 'video',
+                                        sources: [
+                                            {
+                                                src: ep.videoId,
+                                                type: 'video/mp4',
+                                            },
+                                        ],
                                     }}
-                                ></iframe>
+                                />
                             ) : (
                                 <Typography color="error" mt={2}>
                                     {langData.videoNotFound}
                                 </Typography>
                             )}
+
+
 
                             <Typography
                                 variant="body2"
