@@ -42,13 +42,12 @@ export default function Navbar() {
         setDrawerOpen(open);
     };
 
-    // Menu ichidagi linklar (mobile drawer)
     const drawerLinks = [
         { text: langData.home, to: "/" },
         { text: langData.help, to: "/help" },
         { text: langData.adress, to: "/require" },
         ...(user
-            ? [] // Profil va Search alohida, Drawerda emas
+            ? [] 
             : [
                 { text: langData.login, to: "/signin" },
                 { text: langData.register, to: "/signup" },
@@ -71,7 +70,6 @@ export default function Navbar() {
                         />
                     </Box>
 
-                    {/* Desktop menu */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 1 }}>
                         <Button color="inherit" component={Link} to="/">
                             {langData.home}
@@ -161,7 +159,6 @@ export default function Navbar() {
                         )}
                     </Box>
 
-                    {/* Mobile menu */}
                     <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1 }}>
                         <Select
                             size="small"
@@ -211,7 +208,6 @@ export default function Navbar() {
                 </Toolbar>
             </AppBar>
 
-            {/* Drawer for mobile */}
             <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
                 <Box
                     sx={{ width: 250 }}

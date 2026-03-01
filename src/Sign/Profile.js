@@ -49,7 +49,7 @@ export default function Profile() {
     const db = getFirestore();
 
     const [user, setUser] = useState(null);
-    const [userData, setUserData] = useState(null); // Firestore'dan olingan ma'lumot
+    const [userData, setUserData] = useState(null); 
     const [photo, setPhoto] = useState(null);
     const [preview, setPreview] = useState(null);
     const [open, setOpen] = useState(false);
@@ -59,7 +59,6 @@ export default function Profile() {
     const langData = useMemo(() => locale[states.lang], [states.lang]);
 
 
-    // 🔹 Auth o‘zgarishini kuzatish
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             setUser(currentUser);
@@ -76,7 +75,6 @@ export default function Profile() {
         return () => unsubscribe();
     }, [auth, db]);
 
-    // 🔹 Rasmni oldindan ko‘rsatish
     useEffect(() => {
         if (photo) {
             const reader = new FileReader();

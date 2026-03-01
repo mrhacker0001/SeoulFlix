@@ -26,7 +26,6 @@ const SignUpPage = () => {
     const langData = useMemo(() => locale[states.lang], [states.lang]);
 
 
-    // Validation regex
     const gmailRegex = /^[A-Za-z0-9._%+-]+@gmail\.com$/;
     const phoneRegex = /^\+998\d{9}$/;
     const isEmailValid = gmailRegex.test(email);
@@ -36,7 +35,6 @@ const SignUpPage = () => {
         setError("");
         setLoading(true);
         try {
-            // Client-side validation before Firebase call
             if (!isEmailValid) {
                 setError(langData.onlygmail);
                 return;
@@ -45,14 +43,11 @@ const SignUpPage = () => {
                 setError(langData.requiredphone);
                 return;
             }
-            // 🔹 Firebase Authentication orqali foydalanuvchini yaratish
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // 🔹 Foydalanuvchi profilini yangilash
             await updateProfile(user, { displayName: name });
 
-            // 🔹 Firestore'ga foydalanuvchi ma'lumotlarini yozish
             await setDoc(doc(db, "users", user.uid), {
                 name,
                 email,

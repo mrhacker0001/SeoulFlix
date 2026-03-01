@@ -78,7 +78,7 @@ export default function DramaPage() {
                         return {
                             id: d.id,
                             ...data,
-                            views: data.views || 0, // agar views yo‘q bo‘lsa 0
+                            views: data.views || 0,
                         };
                     })
                     .sort((a, b) => {
@@ -90,7 +90,6 @@ export default function DramaPage() {
                 setEpisodes(epList);
                 if (epList.length > 0) setExpandedEpisode(epList[0].id);
 
-                // 🔹 Likes & Comments
                 epList.forEach((ep) => {
                     const likesRef = collection(db, "dramas", id, "episodes", ep.id, "likes");
                     getDocs(likesRef).then((likesSnap) => {
@@ -135,7 +134,6 @@ export default function DramaPage() {
         fetchDrama();
     }, [id, user]);
 
-    // 🔹 Epizod ochilganda views ni 1 taga oshirish
     useEffect(() => {
         if (!expandedEpisode || !id) return;
 
@@ -144,7 +142,6 @@ export default function DramaPage() {
                 const epRef = doc(db, "dramas", id, "episodes", expandedEpisode);
                 await updateDoc(epRef, { views: increment(1) });
 
-                // Local state ni ham yangilaymiz
                 setEpisodes((prev) =>
                     prev.map((ep) =>
                         ep.id === expandedEpisode
@@ -246,7 +243,6 @@ export default function DramaPage() {
                 {drama.title}
             </Typography>
 
-            {/* 🔹 Epizod tugmalari */}
             <Box
                 sx={{
                     display: "flex",
@@ -305,7 +301,6 @@ export default function DramaPage() {
                                     : drama.description}
                             </Typography>
 
-                            {/* 🔹 Like + Views */}
                             <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 1, flexWrap: "wrap" }}>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                     <IconButton onClick={() => handleLike(ep.id)}>
@@ -336,7 +331,6 @@ export default function DramaPage() {
                                 </Box>
                             </Box>
 
-                            {/* 🔹 Kommentlar */}
                             <Box sx={{ mt: 2 }}>
                                 <Divider sx={{ mb: 2 }} />
                                 <Typography variant="h6" gutterBottom>

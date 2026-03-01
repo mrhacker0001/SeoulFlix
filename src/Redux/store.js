@@ -24,7 +24,7 @@ const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false, // ❗️ CORS yoki Promise errorlaridan xalos bo‘lish uchun bu muhim
+            serializableCheck: false, 
         }),
 });
 

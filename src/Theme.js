@@ -4,7 +4,7 @@ const theme = createTheme({
     palette: {
         mode: "dark",
         primary: {
-            main: "#e50914", // Netflix uslubida
+            main: "#e50914", a
         },
         background: {
             default: "#121212",
