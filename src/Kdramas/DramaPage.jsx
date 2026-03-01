@@ -301,7 +301,7 @@ export default function DramaPage() {
                                 sx={{ mb: 1 }}
                             >
                                 {drama.description?.length > 100
-                                    ? drama.description.slice(0, 100) + "..."
+                                    ? drama.description.slice(0, 250) + "..."
                                     : drama.description}
                             </Typography>
 
