@@ -149,7 +149,7 @@ export default function DramaList() {
                     borderRadius: 3,
                     boxShadow: 3,
                     height: "100%",
-                    width: 280,
+                    width: 300,
                     transition: "0.3s",
                     "&:hover": {
                         boxShadow: 6,
@@ -179,7 +179,7 @@ export default function DramaList() {
 
                         <Typography variant="body2" color="text.secondary" mb={1}>
                             {drama.description?.length > 100
-                                ? drama.description.slice(0, 100) + "..."
+                                ? drama.description.slice(0, 250) + "..."
                                 : drama.description}
                         </Typography>
 
