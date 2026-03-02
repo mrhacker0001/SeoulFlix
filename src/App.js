@@ -27,8 +27,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dramalist" element={<DramaList />} />
           <Route path="/drama/:id" element={<DramaPage />} />
-          <Route path="/admin/drama" element={<AdminAddDrama />} />
-          <Route path="/admin/episode" element={<AdminAddEpisode />} />
+          <Route path="/onlyadmin/adddrama" element={<AdminAddDrama />} />
+          <Route path="/onlyadmin/addepisode" element={<AdminAddEpisode />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
