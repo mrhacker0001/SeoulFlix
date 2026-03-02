@@ -1,8 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
-import { Plyr } from 'plyr-react';
-import 'plyr-react/plyr.css';
+import ArtPlayerComponent from "./ArtPlayerComponent";
 import {
     collection,
     getDoc,
@@ -275,17 +274,7 @@ export default function DramaPage() {
                         >
                             {ep.title || `${langData.episode} ${ep.episode}`}
                             {ep.videoId ? (
-                                <Plyr
-                                    source={{
-                                        type: 'video',
-                                        sources: [
-                                            {
-                                                src: ep.videoId,
-                                                type: 'video/mp4',
-                                            },
-                                        ],
-                                    }}
-                                />
+                                <ArtPlayerComponent url={ep.videoId} />
                             ) : (
                                 <Typography color="error" mt={2}>
                                     {langData.videoNotFound}

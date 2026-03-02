@@ -123,6 +123,7 @@ export default function DramaList() {
     const handleWatch = (dramaId) => {
         if (!user) {
             setAlertOpen(true);
+            navigate(`signup`)
             return;
         }
         navigate(`/drama/${dramaId}`);
@@ -257,7 +258,7 @@ export default function DramaList() {
                 open={alertOpen}
                 autoHideDuration={3000}
                 onClose={() => setAlertOpen(false)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
             >
                 <Alert severity="warning">
                     {langData.loginRequired}
