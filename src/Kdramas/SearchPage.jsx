@@ -39,29 +39,87 @@ export default function SearchPage() {
     };
 
     return (
-        <Container sx={{ mt: 4 }}>
+        <Container
+            maxWidth="xl"
+            sx={{
+                mt: 4,
+                minHeight: "100vh",
+                backgroundColor: "#0b0b0b",
+                paddingTop: 4,
+                paddingBottom: 6,
+            }}
+        >
+
             <TextField
                 fullWidth
                 label={langData.search}
                 variant="outlined"
-                sx={{ mb: 4 }}
+                sx={{
+                    mb: 4,
+                    input: { color: "#fff" },
+                    label: { color: "#aaa" },
+                    "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#333" },
+                        "&:hover fieldset": { borderColor: "#b30000" },
+                        "&.Mui-focused fieldset": { borderColor: "#ff0000" },
+                        backgroundColor: "#111",
+                        borderRadius: "12px",
+                    },
+                }}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
             />
 
             <Grid container spacing={3}>
                 {filtered.map((drama) => (
-                    <Grid item xs={12} sm={6} md={4} key={drama.id}>
-                        <Card sx={{ bgcolor: "background.paper" }}>
+                    <Grid item xs={12} sm={6} md={4} lg={3} key={drama.id}>
+                        <Card
+                            sx={{
+                                backgroundColor: "#111",
+                                borderRadius: "18px",
+                                overflow: "hidden",
+                                position: "relative",
+                                transition: "all 0.35s ease",
+                                cursor: "pointer",
+                                "&:hover": {
+                                    transform: "translateY(-8px) scale(1.03)",
+                                    boxShadow: "0 20px 40px rgba(255,0,0,0.35)",
+                                },
+                            }}
+                        >
                             <CardActionArea onClick={() => handleClick(drama.id)}>
                                 <CardMedia
                                     component="img"
-                                    height="200"
+                                    height="260"
                                     image={drama.thumbnail}
                                     alt={drama.title}
+                                    sx={{
+                                        transition: "all 0.4s ease",
+                                        "&:hover": {
+                                            transform: "scale(1.08)",
+                                        },
+                                    }}
                                 />
-                                <CardContent>
-                                    <Typography variant="h6">{drama.title}</Typography>
+
+                                <CardContent
+                                    sx={{
+                                        background:
+                                            "linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.4))",
+                                        position: "absolute",
+                                        bottom: 0,
+                                        width: "100%",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="subtitle1"
+                                        sx={{
+                                            color: "#fff",
+                                            fontWeight: 700,
+                                            letterSpacing: "0.3px",
+                                        }}
+                                    >
+                                        {drama.title}
+                                    </Typography>
                                 </CardContent>
                             </CardActionArea>
                         </Card>

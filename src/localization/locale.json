@@ -14,6 +14,7 @@
         "cooperate": "Biz bilan hamkorlik qiling!",
         "search": "Dramani qidiring...",
         "helpCenter": "🆘 Yordam markazi",
+        "social": "Ijtimoiy tarmoqlar",
         "helpSubtitle": "Quyidagi savollar orqali saytdan foydalanishni o‘rganing 👇",
         "faqs": [
             {
@@ -118,6 +119,7 @@
         "cooperate": "Cooperate with us!",
         "search": "Search drama...",
         "helpCenter": "🆘 Help Center",
+        "social": "Social networks",
         "helpSubtitle": "Learn how to use the site through the questions below 👇",
         "faqs": [
             {
@@ -204,6 +206,6 @@
         "noaccount": "Don’t have an account?",
         "onlygmail": "Only @gmail.com addresses are accepted.",
         "requiredphone": "The phone number must start with +998 and consist of 9 digits.",
-        "havean":"Already have an account?"
+        "havean": "Already have an account?"
     }
 }

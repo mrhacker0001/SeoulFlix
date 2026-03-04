@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
 import ArtPlayerComponent from "./ArtPlayerComponent";
+import TelegramIcon from "@mui/icons-material/Telegram";
 import {
     collection,
     getDoc,
@@ -322,6 +323,29 @@ export default function DramaPage() {
                                         {(ratingAvgMap[ep.id]?.toFixed?.(1) || "0.0")} / 5 ({ratingCountMap[ep.id] || 0})
                                     </Typography>
                                 </Box>
+                                <Button
+                                    variant="contained"
+                                    startIcon={<TelegramIcon />}
+                                    href="https://t.me/seoulflix_org"
+                                    target="_blank"
+                                    sx={{
+                                        background: "linear-gradient(135deg, #000000 0%, #b30000 100%)",
+                                        color: "#fff",
+                                        fontWeight: "bold",
+                                        borderRadius: "12px",
+                                        padding: "10px 22px",
+                                        textTransform: "none",
+                                        boxShadow: "0 6px 18px rgba(179,0,0,0.4)",
+                                        transition: "all 0.25s ease",
+                                        "&:hover": {
+                                            background: "linear-gradient(135deg, #b30000 0%, #000000 100%)",
+                                            boxShadow: "0 10px 24px rgba(179,0,0,0.6)",
+                                            transform: "translateY(-2px)",
+                                        },
+                                    }}
+                                >
+                                    Yuklab olish
+                                </Button>
                             </Box>
 
                             <Box sx={{ mt: 2 }}>

@@ -1,8 +1,14 @@
 // src/components/Footer.jsx
 import { useMemo } from "react";
-import { Box, Typography, Link, Grid } from "@mui/material";
+import { Box, Typography, Link, Grid, Button } from "@mui/material";
 import locale from "../localization/locale.json";
 import { useStoreState } from "../Redux/selector";
+import TelegramIcon from "@mui/icons-material/Telegram";
+import InstagramIcon from "@mui/icons-material/Instagram";
+
+
+
+
 
 
 export default function Footer() {
@@ -58,6 +64,55 @@ export default function Footer() {
                             +998 87 355 00 24
                         </a>
                     </Typography>
+                    <Typography variant="h6" fontWeight="bold">
+                        {langData.social}
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<TelegramIcon />}
+                        href="https://t.me/seoulflix_org"
+                        target="_blank"
+                        sx={{
+                            background: "linear-gradient(135deg, #000000 0%, #b30000 100%)",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            borderRadius: "12px",
+                            padding: "10px 22px",
+                            textTransform: "none",
+                            boxShadow: "0 6px 18px rgba(179,0,0,0.4)",
+                            transition: "all 0.25s ease",
+                            "&:hover": {
+                                background: "linear-gradient(135deg, #b30000 0%, #000000 100%)",
+                                boxShadow: "0 10px 24px rgba(179,0,0,0.6)",
+                                transform: "translateY(-2px)",
+                            },
+                        }}
+                    >
+                        Telegram
+                    </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<InstagramIcon />}
+                        href="https://www.instagram.com/seoul_flix?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+                        target="_blank"
+                        sx={{
+                            background: "linear-gradient(135deg, #000000 0%, #b30000 100%)",
+                            color: "#fff",
+                            fontWeight: "bold",
+                            borderRadius: "12px",
+                            padding: "10px 22px",
+                            textTransform: "none",
+                            boxShadow: "0 6px 18px rgba(179,0,0,0.4)",
+                            transition: "all 0.25s ease",
+                            "&:hover": {
+                                background: "linear-gradient(135deg, #b30000 0%, #000000 100%)",
+                                boxShadow: "0 10px 24px rgba(179,0,0,0.6)",
+                                transform: "translateY(-2px)",
+                            },
+                        }}
+                    >
+                        Instagram
+                    </Button>
 
                 </Grid>
             </Grid>
