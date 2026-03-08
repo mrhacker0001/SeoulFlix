@@ -108,7 +108,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold"> (stats.users * 116).toLocaleString()+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold">{stats.users.toLocaleString() * 116}+</Typography>}
                                 <Typography variant="caption" color="gray">Foydalanuvchilar</Typography>
                             </Box>
                         </Box>
@@ -118,7 +118,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">(stats.views * 23).toLocaleString()+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold">{stats.views.toLocaleString() * 23}+</Typography>}
                                 <Typography variant="caption" color="gray">Jami ko'rishlar</Typography>
                             </Box>
                         </Box>
