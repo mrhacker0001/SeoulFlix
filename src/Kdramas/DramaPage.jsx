@@ -4,7 +4,6 @@ import { db, auth } from "../firebaseConfig";
 import ArtPlayerComponent from "./ArtPlayerComponent";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StarIcon from '@mui/icons-material/Star';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SendIcon from '@mui/icons-material/Send';
@@ -14,7 +13,7 @@ import {
 } from "firebase/firestore";
 import {
     Box, Typography, Button, CircularProgress, IconButton,
-    TextField, Divider, Rating, Stack, Avatar, Paper
+    TextField,  Rating, Stack, Avatar, Paper
 } from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import { useStoreState } from "../Redux/selector";

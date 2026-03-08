@@ -11,7 +11,7 @@ import {
     Box,
     Snackbar,
     Alert,
-    Rating,
+    
     Chip,
     Stack
 } from "@mui/material";

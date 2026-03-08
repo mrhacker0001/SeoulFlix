@@ -1,5 +1,5 @@
 import { useMemo, useEffect, useState } from "react";
-import { Box, Typography, Link, Grid, Button, Stack, Divider, Skeleton } from "@mui/material";
+import { Box, Typography, Link, Grid, Stack, Divider, Skeleton } from "@mui/material";
 import { db } from "../firebaseConfig";
 import { collection, getDocs } from "firebase/firestore";
 import locale from "../localization/locale.json";
