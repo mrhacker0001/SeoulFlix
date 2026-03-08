@@ -13,6 +13,7 @@ import HelpPage from "./Kdramas/HelpPage";
 import AdminAddDrama from "./Admin/AdminAddDrama";
 import AdminAddEpisode from "./Admin/AdminAddEpisode";
 import Require from "./Kdramas/Require";
+import AdminDashboard from "./Admin/AdminDashboard";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/drama/:id" element={<DramaPage />} />
           <Route path="/onlyadmin/adddrama" element={<AdminAddDrama />} />
           <Route path="/onlyadmin/addepisode" element={<AdminAddEpisode />} />
+          <Route path="/onlyadmin/editepisode" element={<AdminDashboard />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />

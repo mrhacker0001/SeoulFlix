@@ -1,18 +1,23 @@
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp,  } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
-
-
-
 export default function AdminAddDrama() {
+
     const [formData, setFormData] = useState({
         title: "",
         description: "",
         thumbnail: "",
+        year: "",
         lang: "",
         genres: [],
+        episodesCount: "",
+        duration: "",
+        status: "Completed",
+        ageRating: "13+"
     });
+
+
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -33,6 +38,9 @@ export default function AdminAddDrama() {
         "Sci-Fi",
     ];
 
+    const statusOptions = ["Yakunlangan", "Davom etmoqda"];
+    const ageOptions = ["13+", "16+", "18+"];
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -42,7 +50,7 @@ export default function AdminAddDrama() {
 
     const handleGenreToggle = (genre) => {
         setFormData((prev) => {
-            const selected = new Set(prev.genres || []);
+            const selected = new Set(prev.genres);
             if (selected.has(genre)) {
                 selected.delete(genre);
             } else {
@@ -60,18 +68,31 @@ export default function AdminAddDrama() {
         try {
             await addDoc(collection(db, "dramas"), {
                 ...formData,
+                year: Number(formData.year),
+                episodesCount: Number(formData.episodesCount),
                 uploadDate: serverTimestamp(),
+                views: 0,
+                ratingAvg: 0,
+                ratingCount: 0
             });
+
             setMessage("✅ Drama muvaffaqiyatli qo‘shildi!");
+
             setFormData({
                 title: "",
                 description: "",
                 thumbnail: "",
+                year: "",
                 lang: "",
                 genres: [],
+                episodesCount: "",
+                duration: "",
+                status: "Completed",
+                ageRating: "13+"
             });
+
         } catch (error) {
-            console.error("Xato:", error);
+            console.error(error);
             setMessage("❌ Xatolik yuz berdi!");
         } finally {
             setLoading(false);
@@ -79,85 +100,150 @@ export default function AdminAddDrama() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 via-white to-indigo-50 p-6">
-            <div className="w-full max-w-lg bg-white shadow-2xl rounded-2xl p-8 border border-gray-100">
-                <h2 className="text-3xl font-extrabold text-center text-indigo-700 mb-6">
-                    🎞 Yangi Drama Qo‘shish
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-6">
+
+            <div className="w-full max-w-xl bg-gray-900 shadow-2xl rounded-2xl p-8 border border-gray-800">
+
+                <h2 className="text-3xl font-bold text-center text-red-500 mb-6">
+                    🎬 Yangi Drama Qo‘shish
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+
                     <input
                         type="text"
                         name="title"
-                        placeholder="🎬 Drama nomi"
+                        placeholder="Drama nomi"
                         value={formData.title}
                         onChange={handleChange}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
+                        className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
                         required
                     />
+
                     <textarea
                         name="description"
-                        placeholder="📝 Tavsif"
+                        placeholder="Drama tavsifi"
                         value={formData.description}
                         onChange={handleChange}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-                        required
                         rows={3}
-                    ></textarea>
+                        className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        required
+                    />
+
                     <input
                         type="text"
                         name="thumbnail"
-                        placeholder="🖼 Rasm (URL)"
+                        placeholder="Poster URL"
                         value={formData.thumbnail}
                         onChange={handleChange}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
+                        className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
                         required
                     />
-                    <input
-                        type="text"
-                        name="lang"
-                        placeholder="🌐 Til (uz / en / kr)"
-                        value={formData.lang}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-indigo-400 focus:outline-none transition"
-                    />
 
-                    <div className="border border-gray-200 rounded-xl p-3">
-                        <p className="text-sm font-medium text-gray-700 mb-2">🏷 Janrlar</p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-3">
+
+                        <input
+                            type="number"
+                            name="year"
+                            placeholder="Year"
+                            value={formData.year}
+                            onChange={handleChange}
+                            className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        />
+
+                        <input
+                            type="text"
+                            name="lang"
+                            placeholder="Language (kr / en / uz)"
+                            value={formData.lang}
+                            onChange={handleChange}
+                            className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        />
+
+                        <input
+                            type="number"
+                            name="episodesCount"
+                            placeholder="Episodes soni"
+                            value={formData.episodesCount}
+                            onChange={handleChange}
+                            className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        />
+
+                        <input
+                            type="text"
+                            name="duration"
+                            placeholder="Duration (60 min)"
+                            value={formData.duration}
+                            onChange={handleChange}
+                            className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        />
+
+                    </div>
+
+                    <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                    >
+                        {statusOptions.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                        ))}
+                    </select>
+
+                    <select
+                        name="ageRating"
+                        value={formData.ageRating}
+                        onChange={handleChange}
+                        className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                    >
+                        {ageOptions.map(a => (
+                            <option key={a} value={a}>{a}</option>
+                        ))}
+                    </select>
+
+                    <div className="border border-gray-700 rounded-lg p-3">
+
+                        <p className="text-gray-300 mb-2">Genres</p>
+
+                        <div className="grid grid-cols-2 gap-2">
+
                             {genreOptions.map((g) => (
-                                <label key={g} className="flex items-center gap-2 text-sm">
+                                <label key={g} className="flex items-center gap-2 text-sm text-gray-200">
+
                                     <input
                                         type="checkbox"
-                                        checked={formData.genres?.includes(g) || false}
+                                        checked={formData.genres.includes(g)}
                                         onChange={() => handleGenreToggle(g)}
-                                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                                     />
-                                    <span>{g}</span>
+
+                                    {g}
+
                                 </label>
                             ))}
+
                         </div>
+
                     </div>
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 text-lg font-semibold rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition duration-200 active:scale-95"
+                        className="w-full py-3 bg-red-600 rounded-lg text-white font-semibold hover:bg-red-700"
                     >
-                        {loading ? "⏳ Yuklanmoqda..." : "➕ Qo‘shish"}
+                        {loading ? "⏳ Yuklanmoqda..." : "➕ Drama qo‘shish"}
                     </button>
+
                 </form>
 
                 {message && (
-                    <p
-                        className={`text-center mt-5 text-sm font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-600"
-                            }`}
-                    >
+                    <p className="text-center mt-4 text-sm text-gray-300">
                         {message}
                     </p>
                 )}
+
             </div>
+
         </div>
     );
 }
-

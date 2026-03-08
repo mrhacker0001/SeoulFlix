@@ -3,32 +3,19 @@ import { useParams } from "react-router-dom";
 import { db, auth } from "../firebaseConfig";
 import ArtPlayerComponent from "./ArtPlayerComponent";
 import TelegramIcon from "@mui/icons-material/Telegram";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StarIcon from '@mui/icons-material/Star';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import SendIcon from '@mui/icons-material/Send';
 import {
-    collection,
-    getDoc,
-    getDocs,
-    doc,
-    addDoc,
-    query,
-    orderBy,
-    onSnapshot,
-    setDoc,
-    deleteDoc,
-    updateDoc,
-    increment,
+    collection, getDoc, getDocs, doc, addDoc, query,
+    orderBy, onSnapshot, setDoc, deleteDoc, updateDoc, increment,
 } from "firebase/firestore";
 import {
-    Box,
-    Typography,
-    Button,
-    CircularProgress,
-    Card,
-    IconButton,
-    TextField,
-    Divider,
-    Rating,
+    Box, Typography, Button, CircularProgress, IconButton,
+    TextField, Divider, Rating, Stack, Avatar, Paper
 } from "@mui/material";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import { onAuthStateChanged } from "firebase/auth";
 import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
@@ -46,9 +33,9 @@ export default function DramaPage() {
     const [ratingAvgMap, setRatingAvgMap] = useState({});
     const [ratingCountMap, setRatingCountMap] = useState({});
     const [userRatingMap, setUserRatingMap] = useState({});
+
     const states = useStoreState();
     const langData = useMemo(() => locale[states.lang], [states.lang]);
-
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
@@ -63,56 +50,35 @@ export default function DramaPage() {
                 const docSnap = await getDoc(dramaRef);
 
                 if (!docSnap.exists()) {
-                    console.error("Drama topilmadi");
                     setDrama(null);
-                    setLoading(false);
                     return;
                 }
 
                 const data = docSnap.data();
                 setDrama({ id: docSnap.id, ...data });
 
-                // 🔹 Epizodlarni olish
                 const epSnap = await getDocs(collection(db, "dramas", id, "episodes"));
                 const epList = epSnap.docs
-                    .map((d) => {
-                        const data = d.data();
-                        return {
-                            id: d.id,
-                            ...data,
-                            views: data.views || 0,
-                        };
-                    })
-                    .sort((a, b) => {
-                        const numA = Number(a.episode || 0);
-                        const numB = Number(b.episode || 0);
-                        return numA - numB;
-                    });
+                    .map((d) => ({ id: d.id, ...d.data(), views: d.data().views || 0 }))
+                    .sort((a, b) => Number(a.episode || 0) - Number(b.episode || 0));
 
                 setEpisodes(epList);
                 if (epList.length > 0) setExpandedEpisode(epList[0].id);
 
                 epList.forEach((ep) => {
-                    const likesRef = collection(db, "dramas", id, "episodes", ep.id, "likes");
-                    getDocs(likesRef).then((likesSnap) => {
-                        setLikesMap((prev) => ({
-                            ...prev,
-                            [ep.id]: likesSnap.size,
-                        }));
+                    // Likes listener
+                    onSnapshot(collection(db, "dramas", id, "episodes", ep.id, "likes"), (snap) => {
+                        setLikesMap(prev => ({ ...prev, [ep.id]: snap.size }));
                     });
 
-                    const commentsRef = collection(db, "dramas", id, "episodes", ep.id, "comments");
-                    const q = query(commentsRef, orderBy("date", "desc"));
+                    // Comments listener
+                    const q = query(collection(db, "dramas", id, "episodes", ep.id, "comments"), orderBy("date", "desc"));
                     onSnapshot(q, (snapshot) => {
-                        setCommentsMap((prev) => ({
-                            ...prev,
-                            [ep.id]: snapshot.docs.map((doc) => doc.data()),
-                        }));
+                        setCommentsMap(prev => ({ ...prev, [ep.id]: snapshot.docs.map(d => ({ id: d.id, ...d.data() })) }));
                     });
 
-                    const ratingsRef = collection(db, "dramas", id, "episodes", ep.id, "ratings");
-                    onSnapshot(ratingsRef, (snap) => {
-                        const count = snap.size;
+                    // Ratings listener
+                    onSnapshot(collection(db, "dramas", id, "episodes", ep.id, "ratings"), (snap) => {
                         let sum = 0;
                         let currentUserValue = 0;
                         snap.docs.forEach((d) => {
@@ -120,281 +86,204 @@ export default function DramaPage() {
                             sum += v;
                             if (user && d.id === user.uid) currentUserValue = v;
                         });
-                        const avg = count ? sum / count : 0;
-                        setRatingAvgMap((prev) => ({ ...prev, [ep.id]: avg }));
-                        setRatingCountMap((prev) => ({ ...prev, [ep.id]: count }));
-                        if (user) setUserRatingMap((prev) => ({ ...prev, [ep.id]: currentUserValue }));
+                        setRatingAvgMap(prev => ({ ...prev, [ep.id]: snap.size ? sum / snap.size : 0 }));
+                        setRatingCountMap(prev => ({ ...prev, [ep.id]: snap.size }));
+                        if (user) setUserRatingMap(prev => ({ ...prev, [ep.id]: currentUserValue }));
                     });
                 });
-            } catch (err) {
-                console.error("Xato:", err);
-            } finally {
-                setLoading(false);
-            }
+            } catch (err) { console.error(err); } finally { setLoading(false); }
         };
-
         fetchDrama();
     }, [id, user]);
 
     useEffect(() => {
         if (!expandedEpisode || !id) return;
-
         const updateViews = async () => {
             try {
                 const epRef = doc(db, "dramas", id, "episodes", expandedEpisode);
                 await updateDoc(epRef, { views: increment(1) });
-
-                setEpisodes((prev) =>
-                    prev.map((ep) =>
-                        ep.id === expandedEpisode
-                            ? { ...ep, views: (ep.views || 0) + 1 }
-                            : ep
-                    )
-                );
-            } catch (err) {
-                console.error("Ko‘rishlar sonini yangilashda xato:", err);
-            }
+            } catch (err) { console.error(err); }
         };
-
         updateViews();
     }, [expandedEpisode, id]);
 
-    useEffect(() => {
-        if (!user || !id || episodes.length === 0) return;
-        const fetchUserRatings = async () => {
-            try {
-                const updates = {};
-                for (const ep of episodes) {
-                    const userRatingRef = doc(db, "dramas", id, "episodes", ep.id, "ratings", user.uid);
-                    const userRatingSnap = await getDoc(userRatingRef);
-                    if (userRatingSnap.exists()) {
-                        const v = Number(userRatingSnap.data()?.value || 0);
-                        updates[ep.id] = v;
-                    }
-                }
-                if (Object.keys(updates).length > 0) {
-                    setUserRatingMap((prev) => ({ ...prev, ...updates }));
-                }
-            } catch (e) {
-                console.error("Foydalanuvchi bahosini olishda xato:", e);
-            }
-        };
-        fetchUserRatings();
-    }, [user, id, episodes]);
-
     const handleLike = async (epId) => {
         if (!user) return alert(langData.loginFirst);
-
         const likeRef = doc(db, "dramas", id, "episodes", epId, "likes", user.uid);
         const likeSnap = await getDoc(likeRef);
-
-        if (likeSnap.exists()) {
-            await deleteDoc(likeRef);
-            setLikesMap((prev) => ({ ...prev, [epId]: prev[epId] - 1 }));
-        } else {
-            await setDoc(likeRef, { createdAt: new Date() });
-            setLikesMap((prev) => ({ ...prev, [epId]: (prev[epId] || 0) + 1 }));
-        }
+        likeSnap.exists() ? await deleteDoc(likeRef) : await setDoc(likeRef, { createdAt: new Date() });
     };
 
     const handleRateChange = async (epId, value) => {
         if (!user) return alert(langData.loginToRate);
         if (!value) return;
-        try {
-            const ratingRef = doc(db, "dramas", id, "episodes", epId, "ratings", user.uid);
-            await setDoc(ratingRef, { value: Number(value), createdAt: new Date() });
-            setUserRatingMap((prev) => ({ ...prev, [epId]: Number(value) }));
-        } catch (e) {
-            console.error("Bahoni saqlashda xato:", e);
-        }
+        await setDoc(doc(db, "dramas", id, "episodes", epId, "ratings", user.uid), { value: Number(value), createdAt: new Date() });
     };
 
     const handleAddComment = async (epId) => {
         if (!user) return alert(langData.loginToComment);
-
         const text = commentTextMap[epId]?.trim();
         if (!text) return;
-
         await addDoc(collection(db, "dramas", id, "episodes", epId, "comments"), {
             userId: user.uid,
             userEmail: user.email,
             text,
             date: new Date(),
         });
-
-        setCommentTextMap((prev) => ({ ...prev, [epId]: "" }));
+        setCommentTextMap(prev => ({ ...prev, [epId]: "" }));
     };
 
-    if (loading)
-        return (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-                <CircularProgress color="primary" />
-            </Box>
-        );
+    if (loading) return <Box sx={{ display: "flex", justifyContent: "center", alignItems: 'center', height: '100vh', bgcolor: '#0b0b0b' }}><CircularProgress sx={{ color: '#e50914' }} /></Box>;
+    if (!drama) return <Typography align="center" color="error" mt={5}>{langData.dramaNotFound}</Typography>;
 
-    if (!drama)
-        return (
-            <Typography align="center" color="error" mt={5}>
-                {langData.dramaNotFound}
-            </Typography>
-        );
+    const activeEp = episodes.find(e => e.id === expandedEpisode);
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h4" align="center" fontWeight="bold" mb={2}>
-                {drama.title}
-            </Typography>
+        <Box sx={{
+            bgcolor: "#0b0b0b", minHeight: "100vh", color: "#fff", position: "relative", overflow: "hidden",
+            pb: 10
+        }}>
+            <Box sx={{
+                position: "absolute", top: 0, left: 0, right: 0, height: "100dvw",
+                backgroundImage: `url(${drama.thumbnail})`,
+                backgroundSize: "cover", backgroundPosition: "center",
+                filter: "blur(10px) brightness(0.4)", zIndex: 0, opacity: 0.6
+            }} />
 
-            <Box
-                sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: 1,
-                    mb: 3,
-                    flexWrap: "wrap",
-                }}
-            >
-                {episodes.map((ep) => (
-                    <Button
-                        key={ep.id}
-                        variant={expandedEpisode === ep.id ? "contained" : "outlined"}
-                        onClick={() => setExpandedEpisode(ep.id)}
-                    >
-                        {`${langData.episode} ${ep.episodeNumber || ep.episode}`}
-                    </Button>
-                ))}
-            </Box>
+            <Box sx={{ position: "relative", zIndex: 1, px: { xs: 2, md: 5 }, pt: 4 }}>
+                <Typography variant="h3" align="center" fontWeight="900" sx={{ textTransform: "uppercase", letterSpacing: 2, mb: 1 }}>
+                    {drama.title}
+                </Typography>
+                <Typography variant="subtitle1" align="center" sx={{ color: "rgba(255,255,255,0.6)", mb: 4 }}>
+                    {activeEp?.title || `${langData.episode} ${activeEp?.episode}`}
+                </Typography>
 
-            {/* 🔹 Faol epizod */}
-            {episodes.map(
-                (ep) =>
-                    expandedEpisode === ep.id && (
-                        <Box
+                <Stack direction="row" spacing={1} sx={{ overflowX: "auto", pb: 2, mb: 4, justifyContent: { xs: "flex-start", md: "center" }, "&::-webkit-scrollbar": { display: "none" } }}>
+                    {episodes.map((ep) => (
+                        <Button
                             key={ep.id}
-                            sx={{ width: "100%", maxWidth: 900, mx: "auto", mb: 4 }}
+                            onClick={() => setExpandedEpisode(ep.id)}
+                            sx={{
+                                minWidth: 100, borderRadius: "8px", fontWeight: "bold",
+                                bgcolor: expandedEpisode === ep.id ? "#e50914" : "rgba(255,255,255,0.1)",
+                                color: "#fff", border: expandedEpisode === ep.id ? "none" : "1px solid rgba(255,255,255,0.2)",
+                                "&:hover": { bgcolor: expandedEpisode === ep.id ? "#b00610" : "rgba(255,255,255,0.2)" }
+                            }}
                         >
-                            {ep.title || `${langData.episode} ${ep.episode}`}
-                            {ep.videoId ? (
-                                <ArtPlayerComponent url={ep.videoId} />
+                            {ep.episodeNumber || ep.episode}-QISM
+                        </Button>
+                    ))}
+                </Stack>
+
+                {activeEp && (
+                    <Box sx={{ maxWidth: 1000, mx: "auto" }}>
+                        <Paper elevation={24} sx={{
+                            position: "relative", borderRadius: "20px", overflow: "hidden", bgcolor: "#000",
+                            border: "2px solid #e50914", boxShadow: "0 0 30px rgba(229, 9, 20, 0.4)"
+                        }}>
+                            {activeEp.videoId ? (
+                                <ArtPlayerComponent url={activeEp.videoId} />
                             ) : (
-                                <Typography color="error" mt={2}>
-                                    {langData.videoNotFound}
-                                </Typography>
+                                <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Typography color="error">{langData.videoNotFound}</Typography>
+                                </Box>
                             )}
+                        </Paper>
 
+                        <Box sx={{
+                            mt: 3, p: 2, borderRadius: "15px", bgcolor: "rgba(255,255,255,0.05)",
+                            backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.1)"
+                        }}>
+                            <Stack direction={{ xs: "column", sm: "row" }} spacing={3} alignItems="center" justifyContent="space-between">
+                                <Stack direction="row" spacing={2}>
+                                    <Box sx={{ textAlign: 'center' }}>
+                                        <IconButton onClick={() => handleLike(activeEp.id)} sx={{ color: likesMap[activeEp.id] > 0 ? "#e50914" : "#fff" }}>
+                                            <FavoriteIcon />
+                                        </IconButton>
+                                        <Typography variant="caption" sx={{ display: 'block' }}>{likesMap[activeEp.id] || 0} Likes</Typography>
+                                    </Box>
+                                    <Box sx={{ textAlign: 'center', pt: 1 }}>
+                                        <VisibilityIcon sx={{ color: "rgba(255,255,255,0.5)" }} />
+                                        <Typography variant="caption" sx={{ display: 'block' }}>{activeEp.views || 0} Views</Typography>
+                                    </Box>
+                                </Stack>
 
-
-                            <Typography
-                                variant="body2"
-                                fontSize="14px"
-                                color="text.secondary"
-                                sx={{ mb: 1 }}
-                            >
-                                {drama.description?.length > 100
-                                    ? drama.description.slice(0, 250) + "..."
-                                    : drama.description}
-                            </Typography>
-
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 3, mt: 1, flexWrap: "wrap" }}>
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                    <IconButton onClick={() => handleLike(ep.id)}>
-                                        <FavoriteIcon
-                                            sx={{ color: likesMap[ep.id] > 0 ? "red" : "gray" }}
-                                        />
-                                    </IconButton>
-                                    <Typography>
-                                        {likesMap[ep.id] || 0} {langData.likeCount}
-                                    </Typography>
-
-                                </Box>
-
-                                <Typography color="text.secondary">
-                                    👁️ {ep.views || 0} {langData.views}
-                                </Typography>
-
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                <Stack direction="row" spacing={2} alignItems="center">
                                     <Rating
-                                        name={`rating-${ep.id}`}
-                                        value={Number(userRatingMap[ep.id] || 0)}
-                                        max={5}
-                                        onChange={(e, newValue) => handleRateChange(ep.id, newValue)}
+                                        value={Number(userRatingMap[activeEp.id] || 0)}
+                                        onChange={(e, v) => handleRateChange(activeEp.id, v)}
+                                        emptyIcon={<StarIcon style={{ color: "rgba(255,255,255,0.2)" }} fontSize="inherit" />}
                                     />
-                                    <Typography color="text.secondary">
-                                        {(ratingAvgMap[ep.id]?.toFixed?.(1) || "0.0")} / 5 ({ratingCountMap[ep.id] || 0})
+                                    <Typography variant="h6" color="#e50914" fontWeight="bold">
+                                        {(ratingAvgMap[activeEp.id] || 0).toFixed(1)} <Typography component="span" variant="caption" color="gray">/ 5 ({ratingCountMap[activeEp.id] || 0})</Typography>
                                     </Typography>
-                                </Box>
+                                </Stack>
+
                                 <Button
                                     variant="contained"
                                     startIcon={<TelegramIcon />}
                                     href="https://t.me/seoulflix_org"
                                     target="_blank"
                                     sx={{
-                                        background: "linear-gradient(135deg, #000000 0%, #b30000 100%)",
-                                        color: "#fff",
-                                        fontWeight: "bold",
-                                        borderRadius: "12px",
-                                        padding: "10px 22px",
-                                        textTransform: "none",
-                                        boxShadow: "0 6px 18px rgba(179,0,0,0.4)",
-                                        transition: "all 0.25s ease",
-                                        "&:hover": {
-                                            background: "linear-gradient(135deg, #b30000 0%, #000000 100%)",
-                                            boxShadow: "0 10px 24px rgba(179,0,0,0.6)",
-                                            transform: "translateY(-2px)",
-                                        },
+                                        bgcolor: "#e50914", borderRadius: "30px", px: 4, fontWeight: "bold",
+                                        "&:hover": { bgcolor: "#b00610", transform: "scale(1.05)" }, transition: "0.3s"
                                     }}
                                 >
-                                    Yuklab olish
+                                    YUKLAB OLISH
                                 </Button>
-                            </Box>
+                            </Stack>
 
-                            <Box sx={{ mt: 2 }}>
-                                <Divider sx={{ mb: 2 }} />
-                                <Typography variant="h6" gutterBottom>
-                                    {langData.leaveComment}
-                                </Typography>
-
-                                <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-                                    <TextField
-                                        fullWidth
-                                        variant="outlined"
-                                        size="small"
-                                        placeholder={langData.leaveComment}
-                                        value={commentTextMap[ep.id] || ""}
-                                        onChange={(e) =>
-                                            setCommentTextMap((prev) => ({
-                                                ...prev,
-                                                [ep.id]: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                    <Button variant="contained" onClick={() => handleAddComment(ep.id)}>
-                                        {langData.send}
-                                    </Button>
-                                </Box>
-
-                                {commentsMap[ep.id]?.length > 0 ? (
-                                    commentsMap[ep.id].map((c, i) => (
-                                        <Card key={i} sx={{ mb: 1, p: 1.5 }}>
-                                            <Typography variant="body2">{c.text}</Typography>
-                                            <Typography
-                                                variant="caption"
-                                                color="text.secondary"
-                                            >
-                                                {new Date(c.date.seconds * 1000).toLocaleString()}
-                                            </Typography>
-                                        </Card>
-                                    ))
-                                ) : (
-                                    <Typography variant="body2" color="text.secondary" mt={1}>
-                                        {langData.noComments}
-                                    </Typography>
-                                )}
-                            </Box>
+                            <Typography variant="body2" sx={{ mt: 3, color: "rgba(255,255,255,0.7)", fontStyle: 'italic' }}>
+                                {drama.description}
+                            </Typography>
                         </Box>
-                    )
-            )}
+
+                        <Box sx={{ mt: 6 }}>
+                            <Typography variant="h5" fontWeight="bold" sx={{ mb: 3, borderLeft: "4px solid #e50914", pl: 2 }}>
+                                FIKR QOLDIRING <Typography component="span" color="gray">({commentsMap[activeEp.id]?.length || 0})</Typography>
+                            </Typography>
+
+                            <Stack direction="row" spacing={2} sx={{ mb: 4 }}>
+                                <TextField
+                                    fullWidth
+                                    placeholder={langData.leaveComment}
+                                    value={commentTextMap[activeEp.id] || ""}
+                                    onChange={(e) => setCommentTextMap(prev => ({ ...prev, [activeEp.id]: e.target.value }))}
+                                    sx={{
+                                        "& .MuiOutlinedInput-root": {
+                                            color: "#fff", bgcolor: "rgba(255,255,255,0.05)", borderRadius: "12px",
+                                            "& fieldset": { borderColor: "rgba(255,255,255,0.2)" },
+                                            "&:hover fieldset": { borderColor: "#e50914" }
+                                        }
+                                    }}
+                                />
+                                <IconButton
+                                    onClick={() => handleAddComment(activeEp.id)}
+                                    sx={{ bgcolor: "#e50914", color: "#fff", "&:hover": { bgcolor: "#b00610" }, borderRadius: "12px", width: 56 }}
+                                >
+                                    <SendIcon />
+                                </IconButton>
+                            </Stack>
+
+                            <Stack spacing={2}>
+                                {commentsMap[activeEp.id]?.map((c, i) => (
+                                    <Box key={i} sx={{ p: 2, borderRadius: "12px", bgcolor: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                        <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+                                            <Avatar sx={{ bgcolor: "#e50914", width: 32, height: 32, fontSize: 14 }}>{c.userEmail?.charAt(0).toUpperCase()}</Avatar>
+                                            <Typography variant="subtitle2" fontWeight="bold">{c.userEmail?.split('@')[0]}</Typography>
+                                            <Typography variant="caption" color="gray">{new Date(c.date.seconds * 1000).toLocaleDateString()}</Typography>
+                                        </Stack>
+                                        <Typography variant="body2" sx={{ pl: 6 }}>{c.text}</Typography>
+                                    </Box>
+                                ))}
+                                {!commentsMap[activeEp.id]?.length && (
+                                    <Typography align="center" color="gray">{langData.noComments}</Typography>
+                                )}
+                            </Stack>
+                        </Box>
+                    </Box>
+                )}
+            </Box>
         </Box>
     );
 }
-
