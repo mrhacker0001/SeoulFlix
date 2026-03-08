@@ -22,15 +22,16 @@ export default function Footer() {
                 const usersSnap = await getDocs(collection(db, "users"));
                 const userCount = usersSnap.size;
 
-                
+
                 const dramasSnap = await getDocs(collection(db, "dramas"));
                 let totalViews = 0;
 
                 for (const dramaDoc of dramasSnap.docs) {
                     const episodesSnap = await getDocs(collection(db, "dramas", dramaDoc.id, "episodes"));
-                    episodesSnap.forEach(ep => {
+
+                    for (const ep of episodesSnap.docs) {
                         totalViews += (ep.data().views || 0);
-                    });
+                    }
                 }
 
                 setStats({ users: userCount, views: totalViews });
@@ -107,7 +108,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">{stats.users.toLocaleString()*116}+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold"> (stats.users * 116).toLocaleString()+</Typography>}
                                 <Typography variant="caption" color="gray">Foydalanuvchilar</Typography>
                             </Box>
                         </Box>
@@ -117,7 +118,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">{stats.views.toLocaleString()*23}+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold">(stats.views * 23).toLocaleString()+</Typography>}
                                 <Typography variant="caption" color="gray">Jami ko'rishlar</Typography>
                             </Box>
                         </Box>
