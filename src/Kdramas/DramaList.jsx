@@ -11,7 +11,7 @@ import {
     Box,
     Snackbar,
     Alert,
-    
+
     Chip,
     Stack
 } from "@mui/material";
@@ -205,7 +205,7 @@ export default function DramaList() {
     return (
         <Box sx={{ bgcolor: "#0b0b0b", minHeight: "100vh", p: 3 }}>
             {["Drama", "Comedy"].map(g => {
-                const items = dramas.filter(d => d.genres?.includes(g)).slice(0, 8);
+                const items = dramas.filter(d => d.genres?.includes(g)).slice(0, 1000);
                 if (!items.length) return null;
                 return (
                     <Box key={g} mb={6}>

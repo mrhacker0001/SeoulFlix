@@ -28,7 +28,7 @@ export default function HomePage() {
     ];
 
     return (
-        <Container sx={{ mt: 4 }}>
+        <Container sx={{ mt: 10 }}>
             <HeroBanner banners={banners} />
             <DramaList />
         </Container>
