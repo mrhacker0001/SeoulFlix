@@ -104,7 +104,7 @@ export default function DramaList() {
             <Grid item xs={12} sm={6} md={4} key={drama.id}>
                 <Card
                     sx={{
-                        maxWidth: 320,
+                        maxWidth: 300,
                         mx: "auto",
                         backgroundColor: "#000",
                         border: "2px solid #e50914",

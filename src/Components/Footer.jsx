@@ -104,16 +104,6 @@ export default function Footer() {
                     <Stack spacing={3}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <Avatar sx={{ bgcolor: "rgba(229, 9, 20, 0.1)", color: "#e50914" }}>
-                                <GroupIcon />
-                            </Avatar>
-                            <Box>
-                                {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">{stats.users.toLocaleString() * 116}+</Typography>}
-                                <Typography variant="caption" color="gray">Foydalanuvchilar</Typography>
-                            </Box>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Avatar sx={{ bgcolor: "rgba(229, 9, 20, 0.1)", color: "#e50914" }}>
                                 <BarChartIcon />
                             </Avatar>
                             <Box>
@@ -136,7 +126,7 @@ export default function Footer() {
 
                     <Stack direction="row" spacing={2} sx={{ mt: 3 }}>
                         <IconButton
-                            href="https://t.me/seoulflix_org"
+                            href="https://t.me/seoulflixorg"
                             target="_blank"
                             sx={{
                                 bgcolor: "rgba(255,255,255,0.05)", color: "#fff",
