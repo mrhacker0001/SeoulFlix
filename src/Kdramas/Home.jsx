@@ -3,6 +3,8 @@ import { Container } from "@mui/material";
 import DramaList from "./DramaList";
 import HeroBanner from "../Components/HeroBanner";
 import banner from "./reklama.jpeg";
+import taqlid from "./taqlid.jpg"
+import nefrit from "./nefritortidan.jpg"
 import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
 
@@ -11,14 +13,14 @@ export default function HomePage() {
     const langData = useMemo(() => locale[states.lang], [states.lang]);
     const banners = [
         {
-            imageUrl: banner,
-            title: langData.ads,
-            subtitle: langData.cooperate,
+            imageUrl: nefrit,
+            title: "Nefrit ortifan",
+            subtitle: "Premyera: Nefrit ortidan 1-qism",
         },
         {
-            imageUrl: banner,
-            title: langData.ads,
-            subtitle: langData.cooperate,
+            imageUrl: taqlid,
+            title: "Taqlid",
+            subtitle: "Premyera: Taqldi 1-qism",
         },
         {
             imageUrl: banner,

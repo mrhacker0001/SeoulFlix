@@ -6,7 +6,6 @@ import locale from "../localization/locale.json";
 import { useStoreState } from "../Redux/selector";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import InstagramIcon from "@mui/icons-material/Instagram";
-import GroupIcon from '@mui/icons-material/Group';
 import BarChartIcon from '@mui/icons-material/BarChart';
 
 export default function Footer() {
