@@ -7,6 +7,7 @@ import taqlid from "./taqlid.jpg"
 import nefrit from "./nefritortidan.jpg"
 import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
+import AdHero from "../Components/AdHero";
 
 export default function HomePage() {
     const states = useStoreState();
@@ -32,6 +33,7 @@ export default function HomePage() {
     return (
         <Container sx={{ mt: 10 }}>
             <HeroBanner banners={banners} />
+            <AdHero />
             <DramaList />
         </Container>
     );
