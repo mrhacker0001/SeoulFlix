@@ -15,6 +15,18 @@
 
     <title>SEOULFLIX</title>
     
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  }
+</script>
+
     <script src="https://pl28994647.profitablecpmratenetwork.com/52/0e/4d/520e4d66c68098229cefb3e8ef9156a2.js"></script>
   </head>
   <body>
