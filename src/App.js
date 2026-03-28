@@ -14,9 +14,14 @@ import AdminAddDrama from "./Admin/AdminAddDrama";
 import AdminAddEpisode from "./Admin/AdminAddEpisode";
 import Require from "./Kdramas/Require";
 import AdminDashboard from "./Admin/AdminDashboard";
+import MaintenanceNotice from "./MaintenanceNotice";
 
 function App() {
+  const maintenanceMode = true; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
+
+  if (maintenanceMode) return <MaintenanceNotice />;
   return (
+
     <Router>
       <div style={{
         minHeight: "100vh",
