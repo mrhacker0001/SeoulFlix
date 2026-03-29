@@ -18,7 +18,7 @@ import MaintenanceNotice from "./MaintenanceNotice";
 import FavouritesPage from "./Components/FavouritesPage";
 
 function App() {
-  const maintenanceMode = true; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
+  const maintenanceMode = false; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
 
   if (maintenanceMode) return <MaintenanceNotice />;
   return (
