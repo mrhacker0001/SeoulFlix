@@ -5,6 +5,7 @@ import HeroBanner from "../Components/HeroBanner";
 import banner from "./reklama.jpeg";
 import taqlid from "./taqlid.jpg"
 import nefrit from "./nefritortidan.jpg"
+import oyogusidagiishq from "./Oy og'usidagi ishq.jpg"
 import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
 
@@ -23,9 +24,9 @@ export default function HomePage() {
             subtitle: "Premyera: Taqldi 1-qism",
         },
         {
-            imageUrl: banner,
-            title: langData.ads,
-            subtitle: langData.cooperate,
+            imageUrl: oyogusidagiishq,
+            title: "oy og'usidagi ishq",
+            subtitle: "Premyera: Oy og'usidagi ishq 1-qism",
         },
     ];
 
