@@ -15,13 +15,13 @@ import AdminAddEpisode from "./Admin/AdminAddEpisode";
 import Require from "./Kdramas/Require";
 import AdminDashboard from "./Admin/AdminDashboard";
 import MaintenanceNotice from "./MaintenanceNotice";
+import FavouritesPage from "./Components/FavouritesPage";
 
 function App() {
   const maintenanceMode = true; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
 
   if (maintenanceMode) return <MaintenanceNotice />;
   return (
-
     <Router>
       <div style={{
         minHeight: "100vh",
@@ -42,6 +42,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/require" element={<Require />} />
+          <Route path="/favourites" element={<FavouritesPage />} />
         </Routes>
         <Footer />
       </div>

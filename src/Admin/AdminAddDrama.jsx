@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp,  } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
 export default function AdminAddDrama() {
@@ -11,7 +11,7 @@ export default function AdminAddDrama() {
         year: "",
         lang: "",
         genres: [],
-        episodesCount: "",
+        episodeCount: "",
         duration: "",
         status: "Completed",
         ageRating: "13+"
@@ -67,13 +67,25 @@ export default function AdminAddDrama() {
 
         try {
             await addDoc(collection(db, "dramas"), {
-                ...formData,
+                title: formData.title,
+                description: formData.description,
+                thumbnail: formData.thumbnail,
+                genres: formData.genres,
                 year: Number(formData.year),
-                episodesCount: Number(formData.episodesCount),
-                uploadDate: serverTimestamp(),
-                views: 0,
-                ratingAvg: 0,
-                ratingCount: 0
+                lang: formData.lang,
+                episodeCount: Number(formData.episodsCount),
+                duration: formData.duration,
+                status: formData.status,
+                ageRating: formData.ageRating,
+
+                // 🔥 OPTIMIZED COUNTERS
+                totalViews: 0,
+                totalLikes: 0,
+                totalComments: 0,
+                ratingSum: 0,
+                ratingCount: 0,
+
+                uploadDate: serverTimestamp()
             });
 
             setMessage("✅ Drama muvaffaqiyatli qo‘shildi!");
@@ -85,7 +97,7 @@ export default function AdminAddDrama() {
                 year: "",
                 lang: "",
                 genres: [],
-                episodesCount: "",
+                episodeCount: "",
                 duration: "",
                 status: "Completed",
                 ageRating: "13+"
@@ -162,9 +174,9 @@ export default function AdminAddDrama() {
 
                         <input
                             type="number"
-                            name="episodesCount"
+                            name="episodessCount"
                             placeholder="Episodes soni"
-                            value={formData.episodesCount}
+                            value={formData.episodeCount}
                             onChange={handleChange}
                             className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
                         />

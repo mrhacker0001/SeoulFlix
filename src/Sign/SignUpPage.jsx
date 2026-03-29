@@ -8,7 +8,9 @@ import {
     CircularProgress,
     InputAdornment,
     Stack,
-    IconButton
+    IconButton,
+    Alert,
+    Collapse
 } from "@mui/material";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "../firebaseConfig";
@@ -24,6 +26,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const SignUpPage = () => {
     const [email, setEmail] = useState("");
@@ -44,21 +47,35 @@ const SignUpPage = () => {
     const isEmailValid = gmailRegex.test(email);
     const isPhoneValid = phoneRegex.test(phone);
 
+    // Firebase xatolarini tushunarli qilish
+    const getFriendlyErrorMessage = (errorCode) => {
+        switch (errorCode) {
+            case "auth/email-already-in-use":
+                return "Ushbu email manzili allaqachon ro'yxatdan o'tkazilgan.";
+            case "auth/invalid-email":
+                return "Email manzili noto'g'ri.";
+            case "auth/operation-not-allowed":
+                return "Tizimga kirishga ruxsat berilmagan.";
+            case "auth/weak-password":
+                return "Parol juda oddiy (kamida 6 ta belgi bo'lishi kerak).";
+            case "auth/network-request-failed":
+                return "Internet aloqasini tekshiring.";
+            default:
+                return "Ro'yxatdan o'tishda xatolik yuz berdi. Qayta urinib ko'ring.";
+        }
+    };
+
     const handleSignUp = async () => {
         setError("");
+
+        // Forma validatsiyasi
+        if (!name.trim()) { setError("Ismingizni kiriting!"); return; }
+        if (!isEmailValid) { setError(langData.onlygmail); return; }
+        if (!isPhoneValid) { setError(langData.requiredphone); return; }
+        if (password.length < 6) { setError("Parol kamida 6 ta belgidan iborat bo'lsin!"); return; }
+
         setLoading(true);
         try {
-            if (!isEmailValid) {
-                setError(langData.onlygmail);
-                setLoading(false);
-                return;
-            }
-            if (!isPhoneValid) {
-                setError(langData.requiredphone);
-                setLoading(false);
-                return;
-            }
-
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
@@ -74,7 +91,8 @@ const SignUpPage = () => {
 
             navigate("/");
         } catch (err) {
-            setError(err.message);
+            console.error(err.code);
+            setError(getFriendlyErrorMessage(err.code));
         } finally {
             setLoading(false);
         }
@@ -84,15 +102,19 @@ const SignUpPage = () => {
         "& .MuiOutlinedInput-root": {
             color: "#fff",
             backgroundColor: "rgba(255, 255, 255, 0.05)",
-            borderRadius: "12px",
-            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
+            borderRadius: "14px",
+            transition: "0.3s",
+            "& fieldset": { borderColor: "rgba(255, 255, 255, 0.15)" },
             "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.4)" },
-            "&.Mui-focused fieldset": { borderColor: "#e50914" },
+            "&.Mui-focused fieldset": {
+                borderColor: "#e50914",
+                boxShadow: "0 0 10px rgba(229, 9, 20, 0.2)"
+            },
             "&.Mui-error fieldset": { borderColor: "#ff1744" },
         },
-        "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.6)" },
+        "& .MuiInputLabel-root": { color: "rgba(255, 255, 255, 0.5)" },
         "& .MuiInputLabel-root.Mui-focused": { color: "#e50914" },
-        "& .MuiFormHelperText-root": { color: "#ff1744", fontWeight: "bold" },
+        "& .MuiFormHelperText-root": { color: "#ff1744", fontWeight: "600" },
         mb: 2
     };
 
@@ -103,7 +125,7 @@ const SignUpPage = () => {
             alignItems="center"
             minHeight="100vh"
             sx={{
-                background: "linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7817-6407-4e36-8a50-6ed677943d6c/UZ-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg')",
+                background: "linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6ed7817-6407-4e36-8a50-6ed677943d6c/UZ-en-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg')",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 py: 5,
@@ -111,37 +133,48 @@ const SignUpPage = () => {
             }}
         >
             <Paper
-                elevation={0}
+                elevation={24}
                 sx={{
                     p: { xs: 4, sm: 5 },
                     width: "100%",
                     maxWidth: 480,
                     textAlign: "center",
-                    bgcolor: "rgba(0, 0, 0, 0.85)",
-                    backdropFilter: "blur(12px)",
-                    borderRadius: "24px",
+                    bgcolor: "rgba(15, 15, 15, 0.95)",
+                    backdropFilter: "blur(15px)",
+                    borderRadius: "28px",
                     border: "1px solid rgba(255, 255, 255, 0.1)",
-                    boxShadow: "0 20px 50px rgba(0,0,0,0.6)"
+                    boxShadow: "0 25px 60px rgba(0,0,0,0.7)"
                 }}
             >
-                {/* Logo */}
                 <Box sx={{ mb: 3 }}>
                     <video
                         src="/seoulflix-animation.mp4"
                         autoPlay loop muted playsInline
-                        style={{ width: "140px", height: "auto" }}
+                        style={{ width: "130px", height: "auto", filter: "drop-shadow(0 0 10px #e50914)" }}
                     />
                 </Box>
 
-                <Typography variant="h4" fontWeight="bold" color="#fff" mb={1}>
+                <Typography variant="h4" fontWeight="900" color="#fff" mb={1} sx={{ letterSpacing: -0.5 }}>
                     {langData.register}
                 </Typography>
-                <Typography variant="body2" color="rgba(255,255,255,0.6)" mb={4}>
-                    SeoulFlix olamiga xush kelibsiz!
+                <Typography variant="body2" color="rgba(255,255,255,0.5)" mb={4}>
+                    Ro'yxatdan o'ting va sevimli dramalaringizdan bahra oling!
                 </Typography>
 
                 <Stack component="form" noValidate>
-                    {/* Ism */}
+                    {/* Xato xabari uchun Alert */}
+                    <Collapse in={!!error} sx={{ mb: 2 }}>
+                        <Alert
+                            severity="error"
+                            variant="filled"
+                            icon={<ErrorOutlineIcon fontSize="inherit" />}
+                            sx={{ borderRadius: "10px", bgcolor: "#ff1744" }}
+                            onClose={() => setError("")}
+                        >
+                            {error}
+                        </Alert>
+                    </Collapse>
+
                     <TextField
                         label={langData.name}
                         fullWidth
@@ -151,13 +184,12 @@ const SignUpPage = () => {
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <PersonIcon sx={{ color: "rgba(255,255,255,0.4)" }} />
+                                    <PersonIcon sx={{ color: "rgba(255,255,255,0.3)" }} />
                                 </InputAdornment>
                             ),
                         }}
                     />
 
-                    {/* Telefon */}
                     <TextField
                         label={langData.phone}
                         fullWidth
@@ -165,18 +197,17 @@ const SignUpPage = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         sx={textFieldStyle}
-                        error={phone.length > 0 && !isPhoneValid}
-                        helperText={phone.length > 0 && !isPhoneValid ? langData.requiredphone : ""}
+                        error={phone.length > 4 && !isPhoneValid}
+                        helperText={phone.length > 4 && !isPhoneValid ? langData.requiredphone : ""}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <PhoneIphoneIcon sx={{ color: "rgba(255,255,255,0.4)" }} />
+                                    <PhoneIphoneIcon sx={{ color: "rgba(255,255,255,0.3)" }} />
                                 </InputAdornment>
                             ),
                         }}
                     />
 
-                    {/* Email */}
                     <TextField
                         label={langData.email}
                         fullWidth
@@ -184,18 +215,17 @@ const SignUpPage = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         sx={textFieldStyle}
-                        error={email.length > 0 && !isEmailValid}
-                        helperText={email.length > 0 && !isEmailValid ? langData.onlygmail : ""}
+                        error={email.length > 4 && !isEmailValid}
+                        helperText={email.length > 4 && !isEmailValid ? langData.onlygmail : ""}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <EmailIcon sx={{ color: "rgba(255,255,255,0.4)" }} />
+                                    <EmailIcon sx={{ color: "rgba(255,255,255,0.3)" }} />
                                 </InputAdornment>
                             ),
                         }}
                     />
 
-                    {/* Parol */}
                     <TextField
                         label={langData.password}
                         fullWidth
@@ -206,14 +236,14 @@ const SignUpPage = () => {
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <LockIcon sx={{ color: "rgba(255,255,255,0.4)" }} />
+                                    <LockIcon sx={{ color: "rgba(255,255,255,0.3)" }} />
                                 </InputAdornment>
                             ),
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton
                                         onClick={() => setShowPassword(!showPassword)}
-                                        sx={{ color: "rgba(255,255,255,0.4)" }}
+                                        sx={{ color: "rgba(255,255,255,0.3)", "&:hover": { color: "#fff" } }}
                                     >
                                         {showPassword ? <VisibilityOff /> : <Visibility />}
                                     </IconButton>
@@ -222,35 +252,26 @@ const SignUpPage = () => {
                         }}
                     />
 
-                    {error && (
-                        <Typography
-                            variant="caption"
-                            sx={{ color: "#ff1744", display: 'block', mb: 2, textAlign: 'left', fontWeight: 'bold' }}
-                        >
-                            ⚠️ {error}
-                        </Typography>
-                    )}
-
                     <Button
                         variant="contained"
                         fullWidth
                         size="large"
                         onClick={handleSignUp}
-                        disabled={loading || !name || !password || !isEmailValid || !isPhoneValid}
+                        disabled={loading}
                         startIcon={!loading && <HowToRegIcon />}
                         sx={{
                             mt: 2,
-                            py: 1.5,
+                            py: 1.8,
                             bgcolor: "#e50914",
-                            fontWeight: "bold",
-                            borderRadius: "12px",
+                            fontWeight: "900",
+                            borderRadius: "14px",
                             textTransform: "none",
-                            fontSize: "1rem",
-                            boxShadow: "0 8px 16px rgba(229, 9, 20, 0.4)",
+                            fontSize: "1.1rem",
+                            transition: "0.4s",
                             "&:hover": {
-                                bgcolor: "#b20710",
-                                transform: "translateY(-1px)",
-                                boxShadow: "0 10px 20px rgba(229, 9, 20, 0.5)"
+                                bgcolor: "#ff1f2a",
+                                transform: "translateY(-2px)",
+                                boxShadow: "0 12px 25px rgba(229, 9, 20, 0.5)"
                             },
                             "&:disabled": {
                                 bgcolor: "rgba(255, 255, 255, 0.12)",
@@ -258,20 +279,22 @@ const SignUpPage = () => {
                             }
                         }}
                     >
-                        {loading ? <CircularProgress size={26} sx={{ color: '#fff' }} /> : langData.register}
+                        {loading ? <CircularProgress size={28} sx={{ color: '#fff' }} /> : langData.register}
                     </Button>
                 </Stack>
 
-                <Box sx={{ mt: 4, pt: 3, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-                    <Typography color="rgba(255,255,255,0.5)" variant="body2">
+                <Box sx={{ mt: 5, pt: 3, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                    <Typography color="rgba(255,255,255,0.4)" variant="body2">
                         {langData.havean}{" "}
                         <Link
                             to="/signin"
                             style={{
-                                color: "#e50914",
+                                color: "#fff",
                                 textDecoration: "none",
                                 fontWeight: "bold",
-                                marginLeft: "5px"
+                                borderBottom: "2px solid #e50914",
+                                marginLeft: "5px",
+                                paddingBottom: "2px"
                             }}
                         >
                             {langData.signin}

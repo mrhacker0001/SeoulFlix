@@ -15,7 +15,8 @@ import {
     Select,
     Stack,
     Tooltip,
-    Divider 
+    Divider,
+    Typography // Qo'shildi
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -26,6 +27,8 @@ import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
 import { useDispatch } from "react-redux";
 import { setLang } from "../Redux/lang";
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 export default function Navbar() {
     const [user, setUser] = useState(null);
@@ -63,6 +66,7 @@ export default function Navbar() {
         { text: langData.home, to: "/" },
         { text: langData.help, to: "/help" },
         { text: langData.adress, to: "/require" },
+        { text: langData.favourites, to: "/favourites" },
     ];
 
     return (
@@ -70,10 +74,11 @@ export default function Navbar() {
             <AppBar
                 position="sticky"
                 sx={{
-                    bgcolor: "rgba(11, 11, 11, 0.8)",
+                    bgcolor: "rgba(11, 11, 11, 0.95)",
                     backdropFilter: "blur(15px)",
                     borderBottom: "1px solid rgba(255,255,255,0.05)",
-                    boxShadow: "none"
+                    boxShadow: "none",
+                    zIndex: 1100
                 }}
             >
                 <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
@@ -98,6 +103,7 @@ export default function Navbar() {
                         />
                     </Box>
 
+                    {/* Desktop Menu */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
                         <Button component={Link} to="/" sx={navLinkStyle("/")}>
                             {langData.home}
@@ -107,6 +113,9 @@ export default function Navbar() {
                         </Button>
                         <Button component={Link} to="/require" sx={navLinkStyle("/require")}>
                             {langData.adress}
+                        </Button>
+                        <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>
+                            {langData.favourites}
                         </Button>
 
                         <Divider orientation="vertical" flexItem sx={{ bgcolor: "rgba(255,255,255,0.1)", mx: 1 }} />
@@ -170,6 +179,7 @@ export default function Navbar() {
                         )}
                     </Box>
 
+                    {/* Mobile Icons */}
                     <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 0.5 }}>
                         <IconButton component={Link} to="/search" sx={{ color: "#fff" }}>
                             <SearchIcon />
@@ -187,6 +197,54 @@ export default function Navbar() {
                         </IconButton>
                     </Box>
                 </Toolbar>
+
+                {/* --- YANGI QO'LLAB-QUVVATLASH PANELI --- */}
+                <Box sx={{
+                    bgcolor: "rgba(229, 9, 20, 0.15)", // Shaffof qizil fon
+                    py: 0.8,
+                    px: { xs: 2, md: 5 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderTop: "1px solid rgba(255,255,255,0.05)",
+                    borderBottom: "1px solid rgba(229, 9, 20, 0.3)"
+                }}>
+                    <Typography sx={{
+                        color: "rgba(255,255,255,0.8)",
+                        fontSize: { xs: "0.7rem", md: "0.85rem" },
+                        fontFamily: 'Delta', // Siz tanlagan font
+                        fontWeight: "500",
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        letterSpacing: 2
+                    }}>
+                        <FavoriteIcon sx={{ fontSize: 16, color: "#e50914" }} />
+                        Loyiha rivoji uchun hissangizni qo'shing
+                    </Typography>
+
+                    <Button
+                        href="https://tirikchilik.uz/seoulflix" // O'z ssilkangiz
+                        target="_blank"
+                        size="small"
+                        startIcon={<VolunteerActivismIcon />}
+                        sx={{
+                            bgcolor: "#e50914",
+                            color: "#fff",
+                            fontSize: { xs: "0.65rem", md: "0.75rem" },
+                            fontWeight: "bold",
+                            fontFamily: 'GoldenDemo', // Siz tanlagan font
+                            borderRadius: "6px",
+                            px: 2,
+                            py: 0.3,
+                            textTransform: "uppercase",
+                            "&:hover": { bgcolor: "#b20710", transform: "scale(1.03)" },
+                            transition: "0.2s"
+                        }}
+                    >
+                        Tirikchilik
+                    </Button>
+                </Box>
             </AppBar>
 
             <Drawer

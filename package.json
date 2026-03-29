@@ -15,6 +15,7 @@
     "artplayer": "^5.3.0",
     "aws-sdk": "^2.1693.0",
     "firebase": "^12.8.0",
+    "lottie-react": "^2.4.1",
     "package": "^1.0.1",
     "plyr": "^3.8.4",
     "plyr-react": "^6.0.0",

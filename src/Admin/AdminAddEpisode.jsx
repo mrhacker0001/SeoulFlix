@@ -6,6 +6,10 @@ import {
     query,
     orderBy,
     serverTimestamp,
+    limit,
+    doc,
+    updateDoc,
+    increment
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 
@@ -22,10 +26,17 @@ export default function AdminAddEpisode() {
 
     useEffect(() => {
         const fetchDramas = async () => {
-            const q = query(collection(db, "dramas"), orderBy("uploadDate", "desc"));
+            const q = query(
+                collection(db, "dramas"),
+                orderBy("uploadDate", "desc"),
+                limit(20) // 🔥 READS OPTIMIZATION
+            );
             const querySnapshot = await getDocs(q);
             setDramas(
-                querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+                querySnapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }))
             );
         };
         fetchDramas();
@@ -40,6 +51,7 @@ export default function AdminAddEpisode() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         if (!selectedDrama) {
             setMessage("⚠️ Avval drama tanlang!");
             return;
@@ -49,11 +61,32 @@ export default function AdminAddEpisode() {
         setMessage("");
 
         try {
-            await addDoc(collection(db, `dramas/${selectedDrama}/episodes`), {
-                ...formData,
-                uploadDate: serverTimestamp(),
+            // 🔥 EPISODE ADD
+            await addDoc(
+                collection(db, `dramas/${selectedDrama}/episodes`),
+                {
+                    episode: Number(formData.episode), // 🔥 FIX
+                    season: Number(formData.season || 1), // 🔥 FIX
+                    videoId: formData.videoId,
+
+                    // 🔥 COUNTERS
+                    views: 0,
+                    likesCount: 0,
+                    commentsCount: 0,
+                    ratingSum: 0,
+                    ratingCount: 0,
+
+                    uploadDate: serverTimestamp(),
+                }
+            );
+
+            // 🔥 DRAMA episodeCount UPDATE
+            await updateDoc(doc(db, "dramas", selectedDrama), {
+                episodeCount: increment(1),
             });
+
             setMessage("✅ Epizod muvaffaqiyatli qo‘shildi!");
+
             setFormData({
                 episode: "",
                 season: "",
@@ -78,7 +111,7 @@ export default function AdminAddEpisode() {
                     <select
                         value={selectedDrama}
                         onChange={(e) => setSelectedDrama(e.target.value)}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                        className="w-full border border-gray-300 p-3 rounded-xl"
                         required
                     >
                         <option value="">🎞 Dramani tanlang</option>
@@ -91,20 +124,20 @@ export default function AdminAddEpisode() {
 
                     <div className="grid grid-cols-2 gap-4">
                         <input
-                            type="text"
+                            type="number"
                             name="season"
                             placeholder="📅 Mavsum"
                             value={formData.season}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                            className="w-full border p-3 rounded-xl"
                         />
                         <input
-                            type="text"
+                            type="number"
                             name="episode"
                             placeholder="🎥 Epizod raqami"
                             value={formData.episode}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                            className="w-full border p-3 rounded-xl"
                             required
                         />
                     </div>
@@ -112,27 +145,24 @@ export default function AdminAddEpisode() {
                     <input
                         type="text"
                         name="videoId"
-                        placeholder="📺 YouTube Video ID"
+                        placeholder="📺 Video ID (DigitalOcean)"
                         value={formData.videoId}
                         onChange={handleChange}
-                        className="w-full border border-gray-300 p-3 rounded-xl focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
+                        className="w-full border p-3 rounded-xl"
                         required
                     />
 
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 text-lg font-semibold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition duration-200 active:scale-95"
+                        className="w-full py-3 text-lg font-semibold rounded-xl bg-blue-600 text-white"
                     >
                         {loading ? "⏳ Yuklanmoqda..." : "➕ Epizod qo‘shish"}
                     </button>
                 </form>
 
                 {message && (
-                    <p
-                        className={`text-center mt-5 text-sm font-medium ${message.startsWith("✅") ? "text-green-600" : "text-red-600"
-                            }`}
-                    >
+                    <p className="text-center mt-5 text-sm font-medium">
                         {message}
                     </p>
                 )}

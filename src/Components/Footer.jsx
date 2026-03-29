@@ -12,16 +12,12 @@ export default function Footer() {
     const states = useStoreState();
     const langData = useMemo(() => locale[states.lang], [states.lang]);
 
-    const [stats, setStats] = useState({ users: 0, views: 0 });
+    const [stats, setStats] = useState({ views: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const usersSnap = await getDocs(collection(db, "users"));
-                const userCount = usersSnap.size;
-
-
                 const dramasSnap = await getDocs(collection(db, "dramas"));
                 let totalViews = 0;
 
@@ -33,7 +29,7 @@ export default function Footer() {
                     }
                 }
 
-                setStats({ users: userCount, views: totalViews });
+                setStats({views: totalViews });
             } catch (error) {
                 console.error("Statistikani yuklashda xato:", error);
             } finally {
@@ -107,7 +103,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">{stats.views.toLocaleString() * 23}+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold">{stats.views.toLocaleString()}+</Typography>}
                                 <Typography variant="caption" color="gray">Jami ko'rishlar</Typography>
                             </Box>
                         </Box>
