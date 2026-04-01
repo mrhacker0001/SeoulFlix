@@ -50,6 +50,7 @@ const FavouritesPage = () => {
                         {favourites.map((drama) => (
                             <Grid item xs={6} sm={4} md={3} key={drama.id}>
                                 <Card sx={{
+                                    width: 250,
                                     bgcolor: "#1a1a1a",
                                     color: "#fff",
                                     borderRadius: "15px",

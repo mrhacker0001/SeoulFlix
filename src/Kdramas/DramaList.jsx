@@ -50,7 +50,7 @@ export default function DramaList() {
             <Grid item xs={12} sm={6} md={4} key={drama?.id || Math.random()}>
                 <Card
                     sx={{
-                        maxWidth: 300,
+                        width: 300,
                         mx: "auto",
                         backgroundColor: "#000",
                         border: "2px solid #e50914",

@@ -14,7 +14,8 @@ export default function AdminAddDrama() {
         episodeCount: "",
         duration: "",
         status: "Completed",
-        ageRating: "13+"
+        ageRating: "13+",
+        downloadUrl: "",
     });
 
 
@@ -73,7 +74,7 @@ export default function AdminAddDrama() {
                 genres: formData.genres,
                 year: Number(formData.year),
                 lang: formData.lang,
-                episodeCount: Number(formData.episodsCount),
+                episodeCount: Number(formData.episodeCount),
                 duration: formData.duration,
                 status: formData.status,
                 ageRating: formData.ageRating,
@@ -174,7 +175,7 @@ export default function AdminAddDrama() {
 
                         <input
                             type="number"
-                            name="episodessCount"
+                            name="episodeCount"
                             placeholder="Episodes soni"
                             value={formData.episodeCount}
                             onChange={handleChange}
@@ -188,6 +189,14 @@ export default function AdminAddDrama() {
                             value={formData.duration}
                             onChange={handleChange}
                             className="p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
+                        />
+                        <input
+                            type="text"
+                            name="downloadUrl"
+                            placeholder="DigitalOcean yuklash linki (MP4)"
+                            value={formData.downloadUrl}
+                            onChange={handleChange}
+                            className="w-full p-3 rounded-lg bg-gray-800 text-white border border-gray-700"
                         />
 
                     </div>

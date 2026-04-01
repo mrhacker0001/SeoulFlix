@@ -59,6 +59,26 @@ export default function DramaPage() {
         setIsFavourite(favs.some(item => item.id === id));
     }, [id]);
 
+    // const handleDownload = async (url, title) => {
+    //     try {
+    //         const response = await fetch(url);
+    //         const blob = await response.blob();
+    //         const blobUrl = window.URL.createObjectURL(blob);
+
+    //         const link = document.createElement('a');
+    //         link.href = blobUrl;
+    //         link.setAttribute('download', `${title}.mp4`); // Fayl nomi
+    //         document.body.appendChild(link);
+    //         link.click();
+    //         link.remove();
+    //         window.URL.revokeObjectURL(blobUrl);
+    //     } catch (error) {
+    //         console.error("Yuklab olishda xatolik:", error);
+    //         // Agar fetch xato bersa, oddiy link orqali ochish:
+    //         window.open(url, '_blank');
+    //     }
+    // };
+
     const toggleFavourite = () => {
         let favs = JSON.parse(localStorage.getItem("favourites") || "[]");
         if (isFavourite) {
@@ -259,7 +279,7 @@ export default function DramaPage() {
 
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2, color: "rgba(255,255,255,0.5)" }}>
                                         <VisibilityIcon fontSize="small" />
-                                        <Typography variant="body2">{activeEp.views || 0}</Typography>
+                                        <Typography variant="body2">{activeEp.views * 13 || 0}</Typography>
                                     </Box>
 
                                     <Button><IconButton onClick={toggleFavourite} sx={{ color: isFavourite ? "#ffeb3b" : "#fff" }}>
@@ -282,6 +302,14 @@ export default function DramaPage() {
                                 <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflix_org" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
                                     {langData.upload}
                                 </Button>
+                                {/* <button
+                                    onClick={() => handleDownload(drama.downloadUrl, drama.title)}
+                                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2"
+                                >
+                                    <a href={episodes.videoId} download>
+                                        Download
+                                    </a>
+                                </button> */}
                             </Stack>
 
 
@@ -337,16 +365,17 @@ export default function DramaPage() {
 
                             <Grid container spacing={2}>
                                 {recommended.map((rec) => (
-                                    <Grid item xs={6} sm={4} md={3} key={rec.id}>
+                                    <Grid item xs={6} sm={4} md={3} key={rec.id} >
                                         <Box
                                             onClick={() => {
                                                 navigate(`/drama/${rec.id}`);
                                                 window.scrollTo(0, 0); // Sahifani tepaga qaytarish
                                             }}
                                             sx={{
+                                                width: 200,
                                                 cursor: "pointer",
                                                 transition: "0.3s",
-                                                "&:hover": { transform: "scale(1.05)" }
+                                                "&:hover": { transform: "scale(1.05)" },
                                             }}
                                         >
                                             <Paper elevation={10} sx={{ borderRadius: "12px", overflow: "hidden", bgcolor: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)" }}>

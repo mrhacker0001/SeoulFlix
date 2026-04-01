@@ -29,7 +29,7 @@ export default function Footer() {
                     }
                 }
 
-                setStats({views: totalViews });
+                setStats({ views: totalViews });
             } catch (error) {
                 console.error("Statistikani yuklashda xato:", error);
             } finally {
@@ -103,7 +103,7 @@ export default function Footer() {
                             </Avatar>
                             <Box>
                                 {loading ? <Skeleton width={60} sx={{ bgcolor: "rgba(255,255,255,0.1)" }} /> :
-                                    <Typography variant="h6" fontWeight="bold">{stats.views.toLocaleString()}+</Typography>}
+                                    <Typography variant="h6" fontWeight="bold">{stats.views * 13}+</Typography>}
                                 <Typography variant="caption" color="gray">Jami ko'rishlar</Typography>
                             </Box>
                         </Box>
