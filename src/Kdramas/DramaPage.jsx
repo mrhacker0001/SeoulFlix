@@ -60,6 +60,10 @@ export default function DramaPage() {
         setIsFavourite(favs.some(item => item.id === id));
     }, [id]);
 
+
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [id]);
     // const handleDownload = async (url, title) => {
     //     try {
     //         const response = await fetch(url);
@@ -242,7 +246,10 @@ export default function DramaPage() {
                     {episodes.map((ep) => (
                         <Button
                             key={ep.id}
-                            onClick={() => setExpandedEpisode(ep.id)}
+                            onClick={() => {
+                                setExpandedEpisode(ep.id);
+                                window.scrollTo({ top: 0, behavior: "smooth" }); // Sahifani tepaga smooth scroll qiladi
+                            }}
                             sx={{
                                 minWidth: 100, borderRadius: "8px", fontWeight: "bold",
                                 fontFamily: 'GoldenDemo',
@@ -271,7 +278,7 @@ export default function DramaPage() {
                             }}
                         >
                             {activeEp.videoId ? (
-                                <VideoPlayer src={activeEp.videoId} />
+                                <VideoPlayer src={activeEp?.videoId} />
                             ) : (
                                 <Box
                                     sx={{

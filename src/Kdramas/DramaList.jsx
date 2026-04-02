@@ -142,7 +142,10 @@ export default function DramaList() {
                                 <Box sx={{ mt: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleWatch(drama.id)}
+                                        onClick={() => {
+                                            handleWatch(drama.id); // video qismi ochish funksiyasi
+                                            window.scrollTo({ top: 0, behavior: "smooth" }); // sahifani tepaga smooth scroll
+                                        }}
                                         endIcon={<PlayArrowIcon />}
                                         sx={{
                                             bgcolor: "#e50914",
