@@ -75,7 +75,7 @@ export default function Footer() {
                         {langData.links}
                     </Typography>
                     <Stack spacing={1.5}>
-                        {['home', 'help', 'profile'].map((item) => (
+                        {['home', 'help', 'profile', 'favourites', 'donations'].map((item) => (
                             <Link
                                 key={item}
                                 href={`/${item === 'home' ? '' : item}`}

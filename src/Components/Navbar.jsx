@@ -67,6 +67,7 @@ export default function Navbar() {
         { text: langData.help, to: "/help" },
         { text: langData.adress, to: "/require" },
         { text: langData.favourites, to: "/favourites" },
+        { text: langData.donations, to: "/donations" },
     ];
 
     return (

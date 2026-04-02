@@ -6,7 +6,6 @@ import {
     List,
     ListItem,
     Divider,
-    Chip,
     Container
 } from "@mui/material";
 import localDonations from "./donations.json"; // JSON faylingiz
