@@ -114,8 +114,11 @@ export default function Navbar() {
                         <Button component={Link} to="/require" sx={navLinkStyle("/require")}>
                             {langData.adress}
                         </Button>
-                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>
+                        <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>
                             {langData.favourites}
+                        </Button>
+                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>
+                            {langData.donations}
                         </Button>
 
                         <Divider orientation="vertical" flexItem sx={{ bgcolor: "rgba(255,255,255,0.1)", mx: 1 }} />

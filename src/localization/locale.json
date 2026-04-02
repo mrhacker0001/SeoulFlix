@@ -1,8 +1,10 @@
 {
     "uz": {
         "home": "Bosh sahifa",
-        "favourites":"Sevimlilar",
-        "addtofav":"Sevimlilarga qo'shish",
+        "favourites": "Sevimlilar",
+        "donations": "Donatlar",
+        "total": "Jami to'plandi",
+        "addtofav": "Sevimlilarga qo'shish",
         "help": "Yordam",
         "adress": "Bog'lanish",
         "login": "Kirish",
@@ -109,6 +111,8 @@
     "en": {
         "home": "Home",
         "favourites": "Favourites",
+        "donations": "Donations",
+        "total": "Total Raised",
         "addtofav": "Add to favourites",
         "help": "Help",
         "adress": "Contact",
