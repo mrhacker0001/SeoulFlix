@@ -114,7 +114,7 @@ export default function Navbar() {
                         <Button component={Link} to="/require" sx={navLinkStyle("/require")}>
                             {langData.adress}
                         </Button>
-                        <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>
+                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>
                             {langData.favourites}
                         </Button>
 

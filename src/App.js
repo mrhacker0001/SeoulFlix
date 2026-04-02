@@ -16,6 +16,7 @@ import Require from "./Kdramas/Require";
 import AdminDashboard from "./Admin/AdminDashboard";
 import MaintenanceNotice from "./MaintenanceNotice";
 import FavouritesPage from "./Components/FavouritesPage";
+import DonationsPage from "./Kdramas/DonationsPage";
 
 function App() {
   const maintenanceMode = false; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
@@ -43,6 +44,7 @@ function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/require" element={<Require />} />
           <Route path="/favourites" element={<FavouritesPage />} />
+          <Route path="/donations" element={<DonationsPage />} />
         </Routes>
         <Footer />
       </div>
