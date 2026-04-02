@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom"; // useNavigate qo'shildi
 import { db, auth } from "../firebaseConfig";
-import ArtPlayerComponent from "./ArtPlayerComponent";
+// import ArtPlayerComponent from "./ArtPlayerComponent";
+import VideoPlayer from "./VideoPlayer";
 import TelegramIcon from "@mui/icons-material/Telegram";
 // import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from '@mui/icons-material/Star';
@@ -257,12 +258,34 @@ export default function DramaPage() {
 
                 {activeEp && (
                     <Box sx={{ maxWidth: 1000, mx: "auto" }}>
-                        <Paper elevation={24} sx={{ position: "relative", borderRadius: "20px", overflow: "hidden", bgcolor: "#000", border: "2px solid #e50914", boxShadow: "0 0 30px rgba(229, 9, 20, 0.4)" }}>
-                            {activeEp.videoId ? <ArtPlayerComponent url={activeEp.videoId} /> :
-                                <Box sx={{ height: 400, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Typography color="error">{langData.videoNotFound}</Typography>
+
+                        <Paper
+                            elevation={24}
+                            sx={{
+                                position: "relative",
+                                borderRadius: "20px",
+                                overflow: "hidden",
+                                bgcolor: "#000",
+                                border: "2px solid #e50914",
+                                boxShadow: "0 0 30px rgba(229, 9, 20, 0.4)"
+                            }}
+                        >
+                            {activeEp.videoId ? (
+                                <VideoPlayer src={activeEp.videoId} />
+                            ) : (
+                                <Box
+                                    sx={{
+                                        height: 400,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}
+                                >
+                                    <Typography color="error">
+                                        {langData.videoNotFound}
+                                    </Typography>
                                 </Box>
-                            }
+                            )}
                         </Paper>
 
                         {/* Like, View, Rating */}
