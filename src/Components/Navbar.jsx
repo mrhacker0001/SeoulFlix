@@ -16,7 +16,7 @@ import {
     Stack,
     Tooltip,
     Divider,
-    Typography // Qo'shildi
+    Typography
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";

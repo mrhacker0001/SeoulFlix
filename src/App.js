@@ -17,6 +17,9 @@ import AdminDashboard from "./Admin/AdminDashboard";
 import MaintenanceNotice from "./MaintenanceNotice";
 import FavouritesPage from "./Components/FavouritesPage";
 import DonationsPage from "./Kdramas/DonationsPage";
+import { Analytics } from "@vercel/analytics/react"
+
+// import SubscriptionPage from "./Components/SubscriptionPage";
 
 function App() {
   const maintenanceMode = false; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
@@ -45,8 +48,10 @@ function App() {
           <Route path="/require" element={<Require />} />
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/donations" element={<DonationsPage />} />
+          {/* <Route path="/subscription" element={<SubscriptionPage />} /> */}
         </Routes>
         <Footer />
+        <Analytics />
       </div>
     </Router>
   );

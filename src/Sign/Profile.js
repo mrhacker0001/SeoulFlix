@@ -225,21 +225,6 @@ export default function Profile() {
                     </label>
                 </Box>
 
-                {photo && (
-                    <Button
-                        variant="contained"
-                        startIcon={uploading ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-                        disabled={uploading}
-                        onClick={handlePhotoUpload}
-                        sx={{
-                            mb: 3, bgcolor: "#00c853", "&:hover": { bgcolor: "#00a142" },
-                            borderRadius: "10px", textTransform: "none"
-                        }}
-                    >
-                        {uploading ? "Uploading..." : langData.upload}
-                    </Button>
-                )}
-
                 {/* User Info List */}
                 <Stack spacing={2} sx={{ textAlign: 'left', mb: 4 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: "rgba(255,255,255,0.05)", borderRadius: "12px" }}>
