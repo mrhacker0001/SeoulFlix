@@ -4,21 +4,13 @@ import locale from "../localization/locale.json";
 import {
     getAuth,
     updatePassword,
-    updateProfile,
     onAuthStateChanged,
     signOut,
 } from "firebase/auth";
 import {
-    getStorage,
-    ref,
-    uploadBytes,
-    getDownloadURL,
-} from "firebase/storage";
-import {
     getFirestore,
     doc,
     getDoc,
-    updateDoc
 } from "firebase/firestore";
 import {
     Button,
@@ -39,7 +31,6 @@ import EmailIcon from '@mui/icons-material/Email';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import LockResetIcon from '@mui/icons-material/LockReset';
 import LogoutIcon from '@mui/icons-material/Logout';
-import SaveIcon from '@mui/icons-material/Save';
 
 const modalStyle = {
     position: "absolute",
@@ -57,7 +48,6 @@ const modalStyle = {
 
 export default function Profile() {
     const auth = getAuth();
-    const storage = getStorage();
     const db = getFirestore();
 
     const [user, setUser] = useState(null);
@@ -67,7 +57,6 @@ export default function Profile() {
     const [open, setOpen] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(true);
-    const [uploading, setUploading] = useState(false);
     const states = useStoreState();
     const langData = useMemo(() => locale[states.lang], [states.lang]);
 
@@ -95,24 +84,7 @@ export default function Profile() {
         }
     }, [photo]);
 
-    const handlePhotoUpload = async () => {
-        if (!photo || !user) return;
-        setUploading(true);
-        try {
-            const storageRef = ref(storage, `profilePhotos/${user.uid}`);
-            await uploadBytes(storageRef, photo);
-            const url = await getDownloadURL(storageRef);
-            await updateProfile(user, { photoURL: url });
-            await updateDoc(doc(db, "users", user.uid), { photoURL: url });
-            setPreview(url);
-            setPhoto(null);
-            alert(langData.uploadSuccess);
-        } catch (err) {
-            alert("Xatolik: " + err.message);
-        } finally {
-            setUploading(false);
-        }
-    };
+
 
     const handlePasswordUpdate = async () => {
         if (newPassword.length < 6) {

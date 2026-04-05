@@ -1,4 +1,4 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 export default function MaintenanceNotice() {
     return (
@@ -16,9 +16,9 @@ export default function MaintenanceNotice() {
             }}
         >
             <Typography variant="h3" fontWeight="bold" sx={{ mb: 2 }}>
-                Sayt Texnik Ishlarda
+                Sayt Yopildi
             </Typography>
-            <Typography variant="h6" sx={{ mb: 4, color: "gray" }}>
+            {/* <Typography variant="h6" sx={{ mb: 4, color: "gray" }}>
                 Biz 3 kun davomida saytda yangilanishlar olib boramiz. Iltimos, keyinroq qayta keling.
             </Typography>
             <Typography variant="body1" sx={{ mb: 3 }}>
@@ -35,7 +35,7 @@ export default function MaintenanceNotice() {
                 onClick={() => window.location.reload()}
             >
                 Saytni Tekshirish
-            </Button>
+            </Button> */}
         </Box>
     );
 }
