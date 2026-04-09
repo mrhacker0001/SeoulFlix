@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage';
 import navbarReducer from './navbarSlice';
 import userReducer from './userSlice';
 import lang from "./lang"
+import maintenanceReducer from "./maintenanceSlice";
 
 const persistConfig = {
     key: 'root',
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     navbar: navbarReducer,
     user: userReducer,
     lang,
+    maintenance: maintenanceReducer,
 });
 
 
@@ -24,7 +26,8 @@ const store = configureStore({
     reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
-            serializableCheck: false, 
+            serializableCheck: false,
+
         }),
 });
 
