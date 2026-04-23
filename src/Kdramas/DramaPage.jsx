@@ -309,7 +309,7 @@ export default function DramaPage() {
 
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2, color: "rgba(255,255,255,0.5)" }}>
                                         <VisibilityIcon fontSize="small" />
-                                        <Typography variant="body2">{activeEp.views * 13 || 0}</Typography>
+                                        <Typography variant="body2">{activeEp.views * 7 || 0}</Typography>
                                     </Box>
 
                                     <Button><IconButton onClick={toggleFavourite} sx={{ color: isFavourite ? "#ffeb3b" : "#fff" }}>

@@ -18,11 +18,14 @@ import MaintenanceNotice from "./MaintenanceNotice";
 import FavouritesPage from "./Components/FavouritesPage";
 import DonationsPage from "./Kdramas/DonationsPage";
 import { Analytics } from "@vercel/analytics/react"
+import Notifications from "./Kdramas/Notifications";
+import OnlyAdminNotification from "./Kdramas/OnlyAdminNotification";
+
 
 // import SubscriptionPage from "./Components/SubscriptionPage";
 
 function App() {
-  const maintenanceMode = true; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
+  const maintenanceMode = false; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
 
   if (maintenanceMode) return <MaintenanceNotice />;
   return (
@@ -48,6 +51,8 @@ function App() {
           <Route path="/require" element={<Require />} />
           <Route path="/favourites" element={<FavouritesPage />} />
           <Route path="/donations" element={<DonationsPage />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/onlyadminnotif" element={<OnlyAdminNotification />} />
           {/* <Route path="/subscription" element={<SubscriptionPage />} /> */}
         </Routes>
         <Footer />

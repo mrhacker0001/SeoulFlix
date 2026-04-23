@@ -14,13 +14,11 @@ import {
     MenuItem,
     Select,
     Stack,
-    Tooltip,
     Divider,
-    Typography
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import SearchIcon from "@mui/icons-material/Search";
 import LanguageIcon from '@mui/icons-material/Language';
 import { useStoreState } from "../Redux/selector";
@@ -29,6 +27,13 @@ import { useDispatch } from "react-redux";
 import { setLang } from "../Redux/lang";
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import HomeIcon from "@mui/icons-material/Home";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import MovieIcon from "@mui/icons-material/Movie";
+import { Badge } from "@mui/material";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+
 
 export default function Navbar() {
     const [user, setUser] = useState(null);
@@ -37,6 +42,18 @@ export default function Navbar() {
     const langData = useMemo(() => locale[states.lang], [states.lang]);
     const dispatch = useDispatch();
     const location = useLocation();
+    const [unreadCount, setUnreadCount] = useState(0);
+
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "notifications"), (snapshot) => {
+            const unread = snapshot.docs.filter(doc => !doc.data().read).length;
+            setUnreadCount(unread);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
 
     useEffect(() => {
         const auth = getAuth();
@@ -83,16 +100,12 @@ export default function Navbar() {
                 }}
             >
                 <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
+
+                    {/* LOGO */}
                     <Box
                         component={Link}
                         to="/"
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            textDecoration: "none",
-                            transition: "0.3s",
-                            "&:hover": { opacity: 0.8 }
-                        }}
+                        sx={{ display: "flex", alignItems: "center", textDecoration: "none" }}
                     >
                         <video
                             src="/seoulflix-animation.mp4"
@@ -100,36 +113,29 @@ export default function Navbar() {
                             loop
                             muted
                             playsInline
-                            style={{ width: "130px", height: "auto", filter: "drop-shadow(0 0 5px rgba(229, 9, 20, 0.3))" }}
+                            style={{ width: "130px" }}
                         />
                     </Box>
 
-                    {/* Desktop Menu */}
+                    {/* DESKTOP */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
-                        <Button component={Link} to="/" sx={navLinkStyle("/")}>
-                            {langData.home}
-                        </Button>
-                        <Button component={Link} to="/help" sx={navLinkStyle("/help")}>
-                            {langData.help}
-                        </Button>
-                        <Button component={Link} to="/require" sx={navLinkStyle("/require")}>
-                            {langData.adress}
-                        </Button>
-                        <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>
-                            {langData.favourites}
-                        </Button>
-                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>
-                            {langData.donations}
-                        </Button>
+                        <Button component={Link} to="/" sx={navLinkStyle("/")}>{langData.home}</Button>
+                        <Button component={Link} to="/help" sx={navLinkStyle("/help")}>{langData.help}</Button>
+                        <Button component={Link} to="/require" sx={navLinkStyle("/require")}>{langData.adress}</Button>
+                        <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>{langData.favourites}</Button>
+                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>{langData.donations}</Button>
 
                         <Divider orientation="vertical" flexItem sx={{ bgcolor: "rgba(255,255,255,0.1)", mx: 1 }} />
 
                         <Stack direction="row" spacing={1} alignItems="center">
-                            <Tooltip title="Qidiruv">
-                                <IconButton component={Link} to="/search" sx={{ color: "#fff", "&:hover": { color: "#e50914" } }}>
-                                    <SearchIcon />
-                                </IconButton>
-                            </Tooltip>
+                            <IconButton component={Link} to="/search" sx={{ color: "#fff" }}>
+                                <SearchIcon />
+                            </IconButton>
+                            <IconButton component={Link} to="/notifications">
+                                <Badge badgeContent={unreadCount} color="error">
+                                    <NotificationsIcon />
+                                </Badge>
+                            </IconButton>
 
                             <Select
                                 size="small"
@@ -138,11 +144,8 @@ export default function Navbar() {
                                 IconComponent={LanguageIcon}
                                 sx={{
                                     color: "white",
-                                    fontSize: "0.8rem",
-                                    fontWeight: "bold",
                                     ".MuiOutlinedInput-notchedOutline": { border: "none" },
-                                    ".MuiSelect-icon": { color: "#e50914", fontSize: "1.2rem", left: -5 },
-                                    ".MuiSelect-select": { pl: 3 }
+                                    ".MuiSelect-icon": { color: "#e50914" }
                                 }}
                             >
                                 <MenuItem value="uz">UZ</MenuItem>
@@ -151,146 +154,105 @@ export default function Navbar() {
                         </Stack>
 
                         {user ? (
-                            <IconButton component={Link} to="/profile" sx={{ p: 0.5, border: "2px solid #e50914" }}>
+                            <IconButton component={Link} to="/profile">
                                 <Avatar src={user.photoURL} sx={{ width: 32, height: 32 }} />
                             </IconButton>
                         ) : (
-                            <Stack direction="row" spacing={1.5}>
-                                <Button
-                                    component={Link}
-                                    to="/signin"
-                                    sx={{ color: "#fff", textTransform: "none", fontWeight: "bold", "&:hover": { color: "#e50914" } }}
-                                >
-                                    {langData.login}
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    component={Link}
-                                    to="/signup"
-                                    sx={{
-                                        textTransform: "none",
-                                        bgcolor: "#e50914",
-                                        fontWeight: "bold",
-                                        borderRadius: "8px",
-                                        px: 3,
-                                        boxShadow: "0 4px 14px rgba(229, 9, 20, 0.4)",
-                                        "&:hover": { bgcolor: "#b20710", boxShadow: "0 6px 20px rgba(229, 9, 20, 0.6)" },
-                                    }}
-                                >
-                                    {langData.register}
-                                </Button>
-                            </Stack>
+                            <Button component={Link} to="/signin" sx={{ color: "#fff" }}>
+                                {langData.login}
+                            </Button>
                         )}
                     </Box>
 
-                    {/* Mobile Icons */}
-                    <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 0.5 }}>
-                        <IconButton component={Link} to="/search" sx={{ color: "#fff" }}>
+                    {/* MOBILE TOP */}
+                    <Box sx={{ display: { xs: "flex", md: "none" } }}>
+                        <IconButton
+                            component={Link}
+                            to="/search"
+                            sx={{ color: "#fff" }}
+                        >
                             <SearchIcon />
                         </IconButton>
-                        {user && (
-                            <Avatar
-                                src={user.photoURL}
-                                sx={{ width: 30, height: 30, border: "1px solid #e50914", mx: 1 }}
-                                component={Link}
-                                to="/profile"
-                            />
-                        )}
-                        <IconButton sx={{ color: "#fff" }} onClick={toggleDrawer(true)}>
-                            <MenuIcon />
+                        <IconButton component={Link} to="/notifications">
+                            <Badge badgeContent={unreadCount} color="error">
+                                <NotificationsIcon />
+                            </Badge>
                         </IconButton>
                     </Box>
                 </Toolbar>
-
-                {/* --- YANGI QO'LLAB-QUVVATLASH PANELI --- */}
-                <Box sx={{
-                    bgcolor: "rgba(229, 9, 20, 0.15)", // Shaffof qizil fon
-                    py: 0.8,
-                    px: { xs: 2, md: 5 },
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    borderTop: "1px solid rgba(255,255,255,0.05)",
-                    borderBottom: "1px solid rgba(229, 9, 20, 0.3)"
-                }}>
-                    <Typography sx={{
-                        color: "rgba(255,255,255,0.8)",
-                        fontSize: { xs: "0.7rem", md: "0.85rem" },
-                        fontFamily: 'Delta', // Siz tanlagan font
-                        fontWeight: "500",
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        letterSpacing: 2
-                    }}>
-                        <FavoriteIcon sx={{ fontSize: 16, color: "#e50914" }} />
-                        Loyiha rivoji uchun hissangizni qo'shing
-                    </Typography>
-
-                    <Button
-                        href="https://tirikchilik.uz/seoulflix" // O'z ssilkangiz
-                        target="_blank"
-                        size="small"
-                        startIcon={<VolunteerActivismIcon />}
-                        sx={{
-                            bgcolor: "#e50914",
-                            color: "#fff",
-                            fontSize: { xs: "0.65rem", md: "0.75rem" },
-                            fontWeight: "bold",
-                            fontFamily: 'GoldenDemo', // Siz tanlagan font
-                            borderRadius: "6px",
-                            px: 2,
-                            py: 0.3,
-                            textTransform: "uppercase",
-                            "&:hover": { bgcolor: "#b20710", transform: "scale(1.03)" },
-                            transition: "0.2s"
-                        }}
-                    >
-                        Tirikchilik
-                    </Button>
-                </Box>
             </AppBar>
 
-            <Drawer
-                anchor="right"
-                open={drawerOpen}
-                onClose={toggleDrawer(false)}
-                PaperProps={{
-                    sx: {
-                        width: 280,
-                        bgcolor: "#0b0b0b",
-                        color: "#fff",
-                        borderLeft: "1px solid rgba(229, 9, 20, 0.2)"
-                    }
-                }}
-            >
-                <Box sx={{ p: 3, textAlign: 'center' }}>
-                    <video
-                        src="/seoulflix-animation.mp4"
-                        autoPlay loop muted playsInline
-                        style={{ width: "100px", marginBottom: "20px" }}
-                    />
-                    <Divider sx={{ bgcolor: "rgba(255,255,255,0.1)", mb: 2 }} />
+            {/* DRAWER */}
+            <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
+                <Box sx={{ width: 250, bgcolor: "#0b0b0b", height: "100%", color: "#fff" }}>
                     <List>
-                        {drawerLinks.map((item, index) => (
-                            <ListItem key={index} disablePadding>
-                                <ListItemButton
-                                    component={Link}
-                                    to={item.to}
-                                    onClick={toggleDrawer(false)}
-                                    sx={{
-                                        borderRadius: "10px",
-                                        mb: 1,
-                                        "&:hover": { bgcolor: "rgba(229, 9, 20, 0.1)", color: "#e50914" }
-                                    }}
-                                >
-                                    <ListItemText primary={item.text} primaryTypographyProps={{ fontWeight: "bold" }} />
+                        {drawerLinks.map((item, i) => (
+                            <ListItem key={i} disablePadding>
+                                <ListItemButton component={Link} to={item.to} onClick={toggleDrawer(false)}>
+                                    <ListItemText primary={item.text} />
                                 </ListItemButton>
                             </ListItem>
                         ))}
                     </List>
                 </Box>
             </Drawer>
+
+            {/* 🔥 MOBILE BOTTOM NAV */}
+            <Box
+                sx={{
+                    display: { xs: "flex", md: "none" },
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    width: "100%",
+                    bgcolor: "rgba(11,11,11,0.9)",
+                    backdropFilter: "blur(10px)",
+                    borderTop: "1px solid rgba(255,255,255,0.08)",
+                    justifyContent: "space-around",
+                    py: 1,
+                    zIndex: 1200
+                }}
+            >
+                {[
+                    { icon: <HomeIcon />, path: "/" },
+                    { icon: <HelpOutlineIcon />, path: "/help" },
+                    { icon: <MovieIcon />, path: "/require" },
+                    { icon: <FavoriteIcon />, path: "/favourites" },
+                    { icon: <VolunteerActivismIcon />, path: "/donations" },
+                    { icon: <Avatar sx={{ width: 22, height: 22 }} src={user?.photoURL} />, path: "/profile" }
+                ].map((item, i) => {
+                    const active = location.pathname === item.path;
+
+                    return (
+                        <IconButton
+                            key={i}
+                            component={Link}
+                            to={item.path}
+                            sx={{
+                                color: active ? "#e50914" : "#9CA3AF",
+                                display: "flex",
+                                flexDirection: "column",
+                                transition: "0.2s",
+                                transform: active ? "translateY(-3px) scale(1.1)" : "none"
+                            }}
+                        >
+                            {item.icon}
+
+                            {active && (
+                                <Box
+                                    sx={{
+                                        width: 5,
+                                        height: 5,
+                                        bgcolor: "#e50914",
+                                        borderRadius: "50%",
+                                        mt: 0.5
+                                    }}
+                                />
+                            )}
+                        </IconButton>
+                    );
+                })}
+            </Box>
         </>
     );
 }

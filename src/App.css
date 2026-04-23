@@ -13,3 +13,6 @@
     src: url('./assets/fonts/DELTA\ BOLD.otf') format('opentype');
 }
 
+body {
+    padding-bottom: 70px;
+}
