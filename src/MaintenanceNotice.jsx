@@ -3,6 +3,8 @@ import Countdown from "react-countdown";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { setDeadline } from "./Redux/maintenanceSlice";
+import TelegramIcon from "@mui/icons-material/Telegram";
+
 
 export default function MaintenanceNotice() {
     const dispatch = useDispatch();
@@ -107,17 +109,21 @@ export default function MaintenanceNotice() {
                 variant="h6"
                 sx={{ mb: 2, color: "gray", maxWidth: 500 }}
             >
-                Texnik nosozlik sababli sayt 45 kun davomida yopildi.
+                Texnik nosozlik sababli sayt 8-maygacha yopildi.
                 Hozirda tizim yangilanmoqda va yaxshilanmoqda.
             </Typography>
 
-            <Typography variant="body1" sx={{ mt: 2 }}>
+            <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflixorg" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
+                Dramalarni telegram orqali tomosha qilish
+            </Button>
+
+            {/* <Typography variant="body1" sx={{ mt: 2 }}>
                 Qayta ochilishigacha qolgan vaqt:
-            </Typography>
+            </Typography> */}
 
-            <Countdown date={deadline} renderer={renderer} />
+            {/* <Countdown date={deadline} renderer={renderer} /> */}
 
-            <Button
+            {/* <Button
                 variant="contained"
                 sx={{
                     mt: 6,
@@ -131,7 +137,7 @@ export default function MaintenanceNotice() {
                 onClick={() => window.location.reload()}
             >
                 Qayta tekshirish
-            </Button>
+            </Button> */}
         </Box>
     );
 }

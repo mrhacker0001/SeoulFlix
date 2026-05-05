@@ -329,7 +329,7 @@ export default function DramaPage() {
                                 </Typography>
                             </Box> */}
 
-                                <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflix_org" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
+                                <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflixorg" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
                                     {langData.upload}
                                 </Button>
                                 {/* <button
