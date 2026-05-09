@@ -25,7 +25,7 @@ import OnlyAdminNotification from "./Kdramas/OnlyAdminNotification";
 // import SubscriptionPage from "./Components/SubscriptionPage";
 
 function App() {
-  const maintenanceMode = true; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
+  const maintenanceMode = false; // test uchun true, realda serverdan yoki env variable bilan boshqarish mumkin
 
   if (maintenanceMode) return <MaintenanceNotice />;
   return (
