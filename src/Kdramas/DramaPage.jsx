@@ -278,7 +278,27 @@ export default function DramaPage() {
                             }}
                         >
                             {activeEp.videoId ? (
-                                <VideoPlayer src={activeEp?.videoId} />
+                                <VideoPlayer
+                                    src={activeEp?.videoId}
+                                    onContextMenu={(e) => e.preventDefault()} // O'ng tugmani bloklaydi
+                                    onMouseDown={(e) => e.button === 2 && e.preventDefault()} // Sichqoncha o'ng tugmasi
+                                    sx={{
+                                        "-webkit-touch-callout": "none", // iOS uchun yuklash menyusini bloklash
+                                        "-webkit-user-select": "none",
+                                        "user-select": "none",
+                                        WebkitTouchCallout: "none",
+                                        // Standart yuklash tugmasini yashirish (ayrim brauzerlarda ishlaydi)
+                                        "& video::-internal-media-controls-download-button": {
+                                            display: "none"
+                                        },
+                                        "& video::-webkit-media-controls-enclosure": {
+                                            overflow: "hidden"
+                                        },
+                                        "& video::-webkit-media-controls-panel": {
+                                            width: "calc(100% + 30px)" // Yuklash tugmasini chetga surib yashirish
+                                        }
+                                    }}
+                                />
                             ) : (
                                 <Box
                                     sx={{
