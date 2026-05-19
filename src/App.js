@@ -42,7 +42,23 @@ function App() {
   }, []);
 
   const openInBrowser = () => {
-    window.open(window.location.href, "_blank");
+    const url = window.location.href;
+
+    // Android uchun Chrome ochish
+    if (/Android/i.test(navigator.userAgent)) {
+      window.location.href =
+        `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+    }
+
+    // iPhone uchun Safari
+    else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.location.href = url;
+    }
+
+    // Oddiy browser
+    else {
+      window.open(url, "_blank");
+    }
   };
 
   if (maintenanceMode) return <MaintenanceNotice />;
@@ -51,64 +67,96 @@ function App() {
     <Router>
 
       {/* TELEGRAM WARNING */}
+      {/* TELEGRAM WARNING */}
       {isTelegram && (
         <div
           style={{
             position: "fixed",
-            bottom: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "90%",
-            maxWidth: "420px",
-            background: "#111",
-            color: "#fff",
-            padding: "20px",
-            borderRadius: "18px",
-            zIndex: 999999,
-            textAlign: "center",
-            boxShadow: "0 0 25px rgba(0,0,0,0.5)",
-            border: "1px solid rgba(255,255,255,0.1)"
+            inset: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "#000",
+            zIndex: 999999999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            overflow: "hidden",
           }}
         >
-          <h2
+          <div
             style={{
-              marginBottom: "10px",
-              fontSize: "20px",
-              fontWeight: "700"
+              width: "90%",
+              maxWidth: "420px",
+              background: "#111",
+              borderRadius: "24px",
+              padding: "30px 20px",
+              textAlign: "center",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "0 0 40px rgba(0,0,0,0.7)",
             }}
           >
-            Telegram ichida ochildi
-          </h2>
+            <h1
+              style={{
+                color: "#fff",
+                fontSize: "24px",
+                marginBottom: "15px",
+                fontWeight: "700",
+              }}
+            >
+              Telegram Browser Aniqladi
+            </h1>
 
-          <p
-            style={{
-              fontSize: "15px",
-              lineHeight: "1.5",
-              opacity: 0.9
-            }}
-          >
-            Saytning ayrim funksiyalari Telegram browserida
-            to‘liq ishlamasligi mumkin.
-            Chrome yoki Safari orqali oching.
-          </p>
+            <p
+              style={{
+                color: "rgba(255,255,255,0.8)",
+                lineHeight: "1.7",
+                fontSize: "15px",
+              }}
+            >
+              Video player va ayrim funksiyalar
+              Telegram ichida to‘liq ishlamaydi.
+              Saytni Chrome yoki Safari orqali oching.
+            </p>
 
-          <button
-            onClick={openInBrowser}
-            style={{
-              marginTop: "15px",
-              width: "100%",
-              padding: "14px",
-              border: "none",
-              borderRadius: "12px",
-              background: "#229ED9",
-              color: "white",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: "pointer"
-            }}
-          >
-            Browserda ochish
-          </button>
+            <button
+              onClick={() => {
+                const url = window.location.href;
+
+                // Android
+                if (/Android/i.test(navigator.userAgent)) {
+                  window.location.href =
+                    `intent://${url.replace(
+                      /^https?:\/\//,
+                      ""
+                    )}#Intent;scheme=https;package=com.android.chrome;end`;
+                }
+
+                // iPhone
+                else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                  window.location.href = url;
+                }
+
+                // Desktop
+                else {
+                  window.open(url, "_blank");
+                }
+              }}
+              style={{
+                width: "100%",
+                marginTop: "25px",
+                padding: "15px",
+                border: "none",
+                borderRadius: "14px",
+                background: "#229ED9",
+                color: "#fff",
+                fontSize: "16px",
+                fontWeight: "700",
+                cursor: "pointer",
+              }}
+            >
+              Chrome orqali ochish
+            </button>
+          </div>
         </div>
       )}
 
