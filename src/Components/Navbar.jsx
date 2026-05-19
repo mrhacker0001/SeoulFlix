@@ -26,6 +26,7 @@ import locale from "../localization/locale.json";
 import { useDispatch } from "react-redux";
 import { setLang } from "../Redux/lang";
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import { Feedback } from "@mui/icons-material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HomeIcon from "@mui/icons-material/Home";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -84,7 +85,7 @@ export default function Navbar() {
         { text: langData.help, to: "/help" },
         { text: langData.adress, to: "/require" },
         { text: langData.favourites, to: "/favourites" },
-        { text: langData.donations, to: "/donations" },
+        { text: langData.feedback, to: "/feedback" },
     ];
 
     return (
@@ -123,7 +124,7 @@ export default function Navbar() {
                         <Button component={Link} to="/help" sx={navLinkStyle("/help")}>{langData.help}</Button>
                         <Button component={Link} to="/require" sx={navLinkStyle("/require")}>{langData.adress}</Button>
                         <Button component={Link} to="/favourites" sx={navLinkStyle("/favourites")}>{langData.favourites}</Button>
-                        <Button component={Link} to="/donations" sx={navLinkStyle("/donations")}>{langData.donations}</Button>
+                        <Button component={Link} to="/feedback" sx={navLinkStyle("/feedback")}>{langData.feedback}</Button>
 
                         <Divider orientation="vertical" flexItem sx={{ bgcolor: "rgba(255,255,255,0.1)", mx: 1 }} />
 
@@ -218,7 +219,7 @@ export default function Navbar() {
                     { icon: <HelpOutlineIcon />, path: "/help" },
                     { icon: <MovieIcon />, path: "/require" },
                     { icon: <FavoriteIcon />, path: "/favourites" },
-                    { icon: <VolunteerActivismIcon />, path: "/donations" },
+                    { icon: <Feedback />, path: "/feedback" },
                     { icon: <Avatar sx={{ width: 22, height: 22 }} src={user?.photoURL} />, path: "/profile" }
                 ].map((item, i) => {
                     const active = location.pathname === item.path;

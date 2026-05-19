@@ -18,10 +18,11 @@ import Require from "./Kdramas/Require";
 import AdminDashboard from "./Admin/AdminDashboard";
 import MaintenanceNotice from "./MaintenanceNotice";
 import FavouritesPage from "./Components/FavouritesPage";
-import DonationsPage from "./Kdramas/DonationsPage";
+// import DonationsPage from "./Kdramas/DonationsPage";
 import { Analytics } from "@vercel/analytics/react"
 import Notifications from "./Kdramas/Notifications";
 import OnlyAdminNotification from "./Kdramas/OnlyAdminNotification";
+import FeedbackPage from "./Kdramas/FeedbackPage";
 
 function App() {
 
@@ -181,7 +182,7 @@ function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/require" element={<Require />} />
           <Route path="/favourites" element={<FavouritesPage />} />
-          <Route path="/donations" element={<DonationsPage />} />
+          <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/onlyadminnotif" element={<OnlyAdminNotification />} />
         </Routes>
