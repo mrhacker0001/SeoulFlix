@@ -102,19 +102,19 @@ export default function MaintenanceNotice() {
                     WebkitTextFillColor: "transparent",
                 }}
             >
-                Sayt vaqtincha yopildi
+                Saytda Texnik Ishlar Olib Borilmoqda
             </Typography>
 
             <Typography
                 variant="h6"
                 sx={{ mb: 2, color: "gray", maxWidth: 500 }}
             >
-                Texnik nosozlik sababli sayt 8-maygacha yopildi.
+                Texnik nosozlik sababli sayt ma'lum bir muddatga yopildi.
                 Hozirda tizim yangilanmoqda va yaxshilanmoqda.
             </Typography>
 
-            <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflixorg" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
-                Dramalarni telegram orqali tomosha qilish
+            <Button variant="contained" startIcon={<TelegramIcon />} href="https://t.me/seoulflixorg_bot" target="_blank" sx={{ bgcolor: "#e50914", fontFamily: 'GoldenDemo', borderRadius: "10px", "&:hover": { bgcolor: "#b00610" } }}>
+                Dramalarni telegram botimiz orqali tomosha qiling
             </Button>
 
             {/* <Typography variant="body1" sx={{ mt: 2 }}>

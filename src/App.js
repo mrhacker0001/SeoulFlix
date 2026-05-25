@@ -26,7 +26,7 @@ import FeedbackPage from "./Kdramas/FeedbackPage";
 
 function App() {
 
-  const maintenanceMode = false;
+  const maintenanceMode = true;
 
   const [isTelegram, setIsTelegram] = useState(false);
 
