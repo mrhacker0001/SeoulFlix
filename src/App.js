@@ -23,10 +23,11 @@ import { Analytics } from "@vercel/analytics/react"
 import Notifications from "./Kdramas/Notifications";
 import OnlyAdminNotification from "./Kdramas/OnlyAdminNotification";
 import FeedbackPage from "./Kdramas/FeedbackPage";
+import SubscriptionPage from "./Components/SubscriptionPage";
 
 function App() {
 
-  const maintenanceMode = true;
+  const maintenanceMode = false;
 
   const [isTelegram, setIsTelegram] = useState(false);
 
@@ -185,6 +186,7 @@ function App() {
           <Route path="/feedback" element={<FeedbackPage />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/onlyadminnotif" element={<OnlyAdminNotification />} />
+          <Route path="/premium" element={<SubscriptionPage />} />
         </Routes>
 
         <Footer />

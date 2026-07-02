@@ -13,7 +13,7 @@ import LoginIcon from '@mui/icons-material/Login'; // Login belgisi
 import "../App.css"
 import {
     collection, getDoc, getDocs, doc, addDoc,
-    query, orderBy, onSnapshot, updateDoc, increment, limit
+    query, orderBy, onSnapshot, limit
 } from "firebase/firestore";
 import {
     Box, Typography, Button, CircularProgress, IconButton,
@@ -22,6 +22,8 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
+import { apiFetch } from "../api";
+import LockIcon from '@mui/icons-material/Lock';
 
 export default function DramaPage() {
     const { id } = useParams();
@@ -33,6 +35,9 @@ export default function DramaPage() {
     const [user, setUser] = useState(null);
     const [isFavourite, setIsFavourite] = useState(false);
     const [recommended, setRecommended] = useState([]);
+    const [videoAccess, setVideoAccess] = useState(null); // { videoUrl, ads, quality, remainingFree }
+    const [accessLoading, setAccessLoading] = useState(false);
+    const [limitReached, setLimitReached] = useState(false);
 
     // Snackbar va Dialog uchun holatlar
     const [openSnack, setOpenSnack] = useState(false);
@@ -175,11 +180,38 @@ export default function DramaPage() {
         fetchDrama();
     }, [id, user]);
 
-    // View increment logikasi o'zgarishsiz qoladi...
+    // Video ko'rish ruxsatini backenddan so'rash.
+    // Premium hozircha o'chirilgan (backendda PREMIUM_ENABLED=false) - shuning uchun
+    // hamma cheklovsiz tomosha qiladi, login ham talab qilinmaydi. Premium yoqilganda
+    // backend o'zi login talab qila boshlaydi, frontendda qo'shimcha o'zgartirish kerak emas.
     useEffect(() => {
         if (!expandedEpisode || !id) return;
-        const epRef = doc(db, "dramas", id, "episodes", expandedEpisode);
-        updateDoc(epRef, { views: increment(1) }).catch(console.error);
+
+        let cancelled = false;
+        setAccessLoading(true);
+        setLimitReached(false);
+        setVideoAccess(null);
+
+        apiFetch(`/api/episodes/${id}/${expandedEpisode}/access`, { method: "POST" })
+            .then((data) => {
+                if (cancelled) return;
+                setVideoAccess(data);
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                if (err.data?.error === "FREE_LIMIT_REACHED") {
+                    setLimitReached(true);
+                } else if (err.status === 401) {
+                    setOpenAuthDialog(true);
+                } else {
+                    console.error(err);
+                }
+            })
+            .finally(() => {
+                if (!cancelled) setAccessLoading(false);
+            });
+
+        return () => { cancelled = true; };
     }, [expandedEpisode, id]);
 
     // --- MODAL VA SNACKBAR LOGIKASI ---
@@ -277,9 +309,33 @@ export default function DramaPage() {
                                 boxShadow: "0 0 30px rgba(229, 9, 20, 0.4)"
                             }}
                         >
-                            {activeEp.videoId ? (
+                            {accessLoading ? (
+                                <Box sx={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                    <CircularProgress sx={{ color: "#e50914" }} />
+                                </Box>
+                            ) : limitReached ? (
+                                <Box sx={{
+                                    height: 400, display: "flex", flexDirection: "column", gap: 2,
+                                    alignItems: "center", justifyContent: "center", textAlign: "center", px: 3
+                                }}>
+                                    <LockIcon sx={{ fontSize: 48, color: "#e50914" }} />
+                                    <Typography variant="h6" fontWeight="bold">
+                                        Bepul tarifdagi oylik limitga yetdingiz
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
+                                        Cheksiz tomosha qilish uchun Premium sotib oling
+                                    </Typography>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => navigate("/premium")}
+                                        sx={{ bgcolor: "#e50914", "&:hover": { bgcolor: "#b00610" }, fontWeight: "bold" }}
+                                    >
+                                        Premium sotib olish
+                                    </Button>
+                                </Box>
+                            ) : videoAccess?.videoUrl ? (
                                 <VideoPlayer
-                                    src={activeEp?.videoId}
+                                    src={videoAccess.videoUrl}
                                     onContextMenu={(e) => e.preventDefault()} // O'ng tugmani bloklaydi
                                     onMouseDown={(e) => e.button === 2 && e.preventDefault()} // Sichqoncha o'ng tugmasi
                                     sx={{
@@ -309,7 +365,17 @@ export default function DramaPage() {
                                     }}
                                 >
                                     <Typography color="error">
-                                        {langData.videoNotFound}
+                                        {user ? langData.videoNotFound : "Tomosha qilish uchun tizimga kiring"}
+                                    </Typography>
+                                </Box>
+                            )}
+                            {videoAccess?.ads && videoAccess?.remainingFree !== null && (
+                                <Box sx={{ px: 2, py: 1, bgcolor: "rgba(229,9,20,0.1)", borderTop: "1px solid rgba(229,9,20,0.3)" }}>
+                                    <Typography variant="caption" sx={{ color: "#ff8a80" }}>
+                                        Bepul tarif • Bu oy yana {videoAccess.remainingFree} ta epizod qoldi —{" "}
+                                        <Box component="span" sx={{ textDecoration: "underline", cursor: "pointer" }} onClick={() => navigate("/premium")}>
+                                            Premiumga o'ting
+                                        </Box>
                                     </Typography>
                                 </Box>
                             )}

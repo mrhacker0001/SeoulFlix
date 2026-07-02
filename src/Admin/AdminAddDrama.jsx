@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { collection, addDoc, serverTimestamp, } from "firebase/firestore";
-import { db } from "../firebaseConfig";
+import { apiFetch } from "../api";
 
 export default function AdminAddDrama() {
 
@@ -67,26 +66,20 @@ export default function AdminAddDrama() {
         setMessage("");
 
         try {
-            await addDoc(collection(db, "dramas"), {
-                title: formData.title,
-                description: formData.description,
-                thumbnail: formData.thumbnail,
-                genres: formData.genres,
-                year: Number(formData.year),
-                lang: formData.lang,
-                episodeCount: Number(formData.episodeCount),
-                duration: formData.duration,
-                status: formData.status,
-                ageRating: formData.ageRating,
-
-                // 🔥 OPTIMIZED COUNTERS
-                totalViews: 0,
-                totalLikes: 0,
-                totalComments: 0,
-                ratingSum: 0,
-                ratingCount: 0,
-
-                uploadDate: serverTimestamp()
+            await apiFetch("/api/admin/dramas", {
+                method: "POST",
+                body: JSON.stringify({
+                    title: formData.title,
+                    description: formData.description,
+                    thumbnail: formData.thumbnail,
+                    genres: formData.genres,
+                    year: formData.year,
+                    lang: formData.lang,
+                    duration: formData.duration,
+                    status: formData.status,
+                    ageRating: formData.ageRating,
+                    downloadUrl: formData.downloadUrl,
+                }),
             });
 
             setMessage("✅ Drama muvaffaqiyatli qo‘shildi!");
@@ -106,7 +99,7 @@ export default function AdminAddDrama() {
 
         } catch (error) {
             console.error(error);
-            setMessage("❌ Xatolik yuz berdi!");
+            setMessage(`❌ ${error.message || "Xatolik yuz berdi!"}`);
         } finally {
             setLoading(false);
         }

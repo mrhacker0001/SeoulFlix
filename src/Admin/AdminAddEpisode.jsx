@@ -2,16 +2,12 @@ import { useEffect, useState } from "react";
 import {
     collection,
     getDocs,
-    addDoc,
     query,
     orderBy,
-    serverTimestamp,
     limit,
-    doc,
-    updateDoc,
-    increment
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { apiFetch } from "../api";
 
 export default function AdminAddEpisode() {
     const [dramas, setDramas] = useState([]);
@@ -61,28 +57,13 @@ export default function AdminAddEpisode() {
         setMessage("");
 
         try {
-            // 🔥 EPISODE ADD
-            await addDoc(
-                collection(db, `dramas/${selectedDrama}/episodes`),
-                {
-                    episode: Number(formData.episode), // 🔥 FIX
-                    season: Number(formData.season || 1), // 🔥 FIX
+            await apiFetch(`/api/admin/dramas/${selectedDrama}/episodes`, {
+                method: "POST",
+                body: JSON.stringify({
+                    episode: formData.episode,
+                    season: formData.season || 1,
                     videoId: formData.videoId,
-
-                    // 🔥 COUNTERS
-                    views: 0,
-                    likesCount: 0,
-                    commentsCount: 0,
-                    ratingSum: 0,
-                    ratingCount: 0,
-
-                    uploadDate: serverTimestamp(),
-                }
-            );
-
-            // 🔥 DRAMA episodeCount UPDATE
-            await updateDoc(doc(db, "dramas", selectedDrama), {
-                episodeCount: increment(1),
+                }),
             });
 
             setMessage("✅ Epizod muvaffaqiyatli qo‘shildi!");
@@ -94,7 +75,7 @@ export default function AdminAddEpisode() {
             });
         } catch (error) {
             console.error("Xato:", error);
-            setMessage("❌ Xatolik yuz berdi!");
+            setMessage(`❌ ${error.message || "Xatolik yuz berdi!"}`);
         } finally {
             setLoading(false);
         }

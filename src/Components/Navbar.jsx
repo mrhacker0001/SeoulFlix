@@ -25,7 +25,6 @@ import { useStoreState } from "../Redux/selector";
 import locale from "../localization/locale.json";
 import { useDispatch } from "react-redux";
 import { setLang } from "../Redux/lang";
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import { Feedback } from "@mui/icons-material";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HomeIcon from "@mui/icons-material/Home";
