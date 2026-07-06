@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 //
 // Agar bu o'zgaruvchi sozlanmagan bo'lsa, quyidagi fallback ishlaydi -
 // productionda bu ISHLAMAYDI, faqat lokal test uchun.
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 export async function apiFetch(path, options = {}) {
     const user = getAuth().currentUser;

@@ -5,16 +5,13 @@ import {
     Typography,
     Button,
     Stack,
-    Chip,
-    IconButton,
-    LinearProgress,
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+// import FavoriteIcon from "@mui/icons-material/Favorite";
+// import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 

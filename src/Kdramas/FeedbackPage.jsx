@@ -1,6 +1,5 @@
 import {
     useState,
-    useMemo,
     useEffect
 } from "react";
 
@@ -28,18 +27,18 @@ import {
 
 import { db } from "../firebaseConfig";
 
-import { useStoreState } from "../Redux/selector";
+// import { useStoreState } from "../Redux/selector";
 
-import locale from "../localization/locale.json";
+// import locale from "../localization/locale.json";
 
 export default function FeedbackPage() {
 
-    const states = useStoreState();
+    // const states = useStoreState();
 
-    const langData = useMemo(
-        () => locale[states.lang],
-        [states.lang]
-    );
+    // const langData = useMemo(
+    //     () => locale[states.lang],
+    //     [states.lang]
+    // );
 
     const [siteCommentText, setSiteCommentText]
         = useState("");

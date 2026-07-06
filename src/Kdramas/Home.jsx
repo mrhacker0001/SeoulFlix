@@ -5,7 +5,7 @@ import HeroBanner from "../Components/HeroBanner";
 import taqlid from "./taqlid.jpg"
 import nefrit from "./nefritortidan.jpeg"
 import overdo from "./overdo.jpeg"
-import reklama from "./reklama.jpeg"
+// import reklama from "./reklama.jpeg"
 // import { useStoreState } from "../Redux/selector";
 // import locale from "../localization/locale.json";
 
