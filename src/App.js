@@ -43,25 +43,25 @@ function App() {
     setIsTelegram(telegram);
   }, []);
 
-  const openInBrowser = () => {
-    const url = window.location.href;
+  // const openInBrowser = () => {
+  //   const url = window.location.href;
 
-    // Android uchun Chrome ochish
-    if (/Android/i.test(navigator.userAgent)) {
-      window.location.href =
-        `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
-    }
+  //   // Android uchun Chrome ochish
+  //   if (/Android/i.test(navigator.userAgent)) {
+  //     window.location.href =
+  //       `intent://${url.replace(/^https?:\/\//, "")}#Intent;scheme=https;package=com.android.chrome;end`;
+  //   }
 
-    // iPhone uchun Safari
-    else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-      window.location.href = url;
-    }
+  //   // iPhone uchun Safari
+  //   else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  //     window.location.href = url;
+  //   }
 
-    // Oddiy browser
-    else {
-      window.open(url, "_blank");
-    }
-  };
+  //   // Oddiy browser
+  //   else {
+  //     window.open(url, "_blank");
+  //   }
+  // };
 
   if (maintenanceMode) return <MaintenanceNotice />;
 

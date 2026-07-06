@@ -15,10 +15,11 @@ export default function AdminAddEpisode() {
     const [formData, setFormData] = useState({
         episode: "",
         season: "",
-        videoId: "",
+        sourceUrl: "",
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [processingStatus, setProcessingStatus] = useState(null); // "processing" | "ready" | "error"
 
     useEffect(() => {
         const fetchDramas = async () => {
@@ -55,23 +56,47 @@ export default function AdminAddEpisode() {
 
         setLoading(true);
         setMessage("");
+        setProcessingStatus(null);
 
         try {
-            await apiFetch(`/api/admin/dramas/${selectedDrama}/episodes`, {
+            const result = await apiFetch(`/api/admin/dramas/${selectedDrama}/episodes`, {
                 method: "POST",
                 body: JSON.stringify({
                     episode: formData.episode,
                     season: formData.season || 1,
-                    videoId: formData.videoId,
+                    sourceUrl: formData.sourceUrl,
                 }),
             });
 
-            setMessage("✅ Epizod muvaffaqiyatli qo‘shildi!");
+            setMessage("✅ Epizod qo‘shildi! Video Bunny'da qayta ishlanmoqda...");
+            setProcessingStatus("processing");
+
+            // Transkodlash tugaguncha holatni har 5 soniyada tekshiramiz
+            const dramaId = selectedDrama;
+            const episodeId = result.id;
+            const poll = setInterval(async () => {
+                try {
+                    const status = await apiFetch(
+                        `/api/admin/dramas/${dramaId}/episodes/${episodeId}/status`
+                    );
+                    setProcessingStatus(status.status);
+                    if (status.status === "ready" || status.status === "error") {
+                        clearInterval(poll);
+                        setMessage(
+                            status.status === "ready"
+                                ? "✅ Video tayyor! Endi saytda ko‘rish mumkin."
+                                : "❌ Video qayta ishlashda xato yuz berdi."
+                        );
+                    }
+                } catch (e) {
+                    clearInterval(poll);
+                }
+            }, 5000);
 
             setFormData({
                 episode: "",
                 season: "",
-                videoId: "",
+                sourceUrl: "",
             });
         } catch (error) {
             console.error("Xato:", error);
@@ -125,13 +150,16 @@ export default function AdminAddEpisode() {
 
                     <input
                         type="text"
-                        name="videoId"
-                        placeholder="📺 Video ID (DigitalOcean)"
-                        value={formData.videoId}
+                        name="sourceUrl"
+                        placeholder="📺 Video linki (hozirgi DigitalOcean URL)"
+                        value={formData.sourceUrl}
                         onChange={handleChange}
                         className="w-full border p-3 rounded-xl"
                         required
                     />
+                    <p className="text-xs text-gray-500 -mt-2 px-1">
+                        Video ochiq (public) linkini kiriting - Bunny Stream uni avtomatik import qilib, HD sifatlarga o'giradi.
+                    </p>
 
                     <button
                         type="submit"
@@ -145,6 +173,12 @@ export default function AdminAddEpisode() {
                 {message && (
                     <p className="text-center mt-5 text-sm font-medium">
                         {message}
+                    </p>
+                )}
+
+                {processingStatus && processingStatus !== "ready" && processingStatus !== "error" && (
+                    <p className="text-center mt-2 text-xs text-blue-600 animate-pulse">
+                        ⏳ Bunny holati: {processingStatus}...
                     </p>
                 )}
             </div>

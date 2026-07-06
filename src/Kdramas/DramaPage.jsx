@@ -38,6 +38,7 @@ export default function DramaPage() {
     const [videoAccess, setVideoAccess] = useState(null); // { videoUrl, ads, quality, remainingFree }
     const [accessLoading, setAccessLoading] = useState(false);
     const [limitReached, setLimitReached] = useState(false);
+    const [videoProcessing, setVideoProcessing] = useState(false);
 
     // Snackbar va Dialog uchun holatlar
     const [openSnack, setOpenSnack] = useState(false);
@@ -188,30 +189,47 @@ export default function DramaPage() {
         if (!expandedEpisode || !id) return;
 
         let cancelled = false;
-        setAccessLoading(true);
-        setLimitReached(false);
+        let retryTimer = null;
+
+        const fetchAccess = (showSpinner = true) => {
+            if (showSpinner) setAccessLoading(true);
+            setLimitReached(false);
+
+            apiFetch(`/api/episodes/${id}/${expandedEpisode}/access`, { method: "POST" })
+                .then((data) => {
+                    if (cancelled) return;
+                    if (data?.error === "VIDEO_PROCESSING") {
+                        setVideoProcessing(true);
+                        setVideoAccess(null);
+                        retryTimer = setTimeout(() => fetchAccess(false), 5000);
+                        return;
+                    }
+                    setVideoProcessing(false);
+                    setVideoAccess(data);
+                })
+                .catch((err) => {
+                    if (cancelled) return;
+                    if (err.data?.error === "FREE_LIMIT_REACHED") {
+                        setLimitReached(true);
+                    } else if (err.status === 401) {
+                        setOpenAuthDialog(true);
+                    } else {
+                        console.error(err);
+                    }
+                })
+                .finally(() => {
+                    if (!cancelled) setAccessLoading(false);
+                });
+        };
+
         setVideoAccess(null);
+        setVideoProcessing(false);
+        fetchAccess(true);
 
-        apiFetch(`/api/episodes/${id}/${expandedEpisode}/access`, { method: "POST" })
-            .then((data) => {
-                if (cancelled) return;
-                setVideoAccess(data);
-            })
-            .catch((err) => {
-                if (cancelled) return;
-                if (err.data?.error === "FREE_LIMIT_REACHED") {
-                    setLimitReached(true);
-                } else if (err.status === 401) {
-                    setOpenAuthDialog(true);
-                } else {
-                    console.error(err);
-                }
-            })
-            .finally(() => {
-                if (!cancelled) setAccessLoading(false);
-            });
-
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+            if (retryTimer) clearTimeout(retryTimer);
+        };
     }, [expandedEpisode, id]);
 
     // --- MODAL VA SNACKBAR LOGIKASI ---
@@ -332,6 +350,19 @@ export default function DramaPage() {
                                     >
                                         Premium sotib olish
                                     </Button>
+                                </Box>
+                            ) : videoProcessing ? (
+                                <Box sx={{
+                                    height: 400, display: "flex", flexDirection: "column", gap: 2,
+                                    alignItems: "center", justifyContent: "center", textAlign: "center", px: 3
+                                }}>
+                                    <CircularProgress sx={{ color: "#e50914" }} />
+                                    <Typography variant="body1" fontWeight="bold">
+                                        Video qayta ishlanmoqda...
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.6)" }}>
+                                        Bir necha daqiqadan so'ng avtomatik tayyor bo'ladi
+                                    </Typography>
                                 </Box>
                             ) : videoAccess?.videoUrl ? (
                                 <VideoPlayer

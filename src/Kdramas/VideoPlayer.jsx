@@ -25,12 +25,13 @@ const VideoPlayer = ({ src }) => {
         };
     }, []);
 
-    // ✅ SOURCE alohida update qilinadi
+    // ✅ SOURCE alohida update qilinadi - HLS (.m3u8) va oddiy MP4 ikkalasini ham qo'llab-quvvatlaydi
     useEffect(() => {
         if (playerRef.current && src) {
+            const isHls = src.includes(".m3u8");
             playerRef.current.src({
                 src: src,
-                type: "video/mp4",
+                type: isHls ? "application/x-mpegURL" : "video/mp4",
             });
         }
     }, [src]);
