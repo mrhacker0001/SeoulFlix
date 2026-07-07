@@ -43,3 +43,5 @@ const ArtPlayerComponent = ({ url }) => {
 };
 
 export default ArtPlayerComponent;
+
+

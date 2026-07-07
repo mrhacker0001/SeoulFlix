@@ -185,6 +185,8 @@ export default function DramaPage() {
     // Premium hozircha o'chirilgan (backendda PREMIUM_ENABLED=false) - shuning uchun
     // hamma cheklovsiz tomosha qiladi, login ham talab qilinmaydi. Premium yoqilganda
     // backend o'zi login talab qila boshlaydi, frontendda qo'shimcha o'zgartirish kerak emas.
+    const [videoErrorMessage, setVideoErrorMessage] = useState(null);
+
     useEffect(() => {
         if (!expandedEpisode || !id) return;
 
@@ -206,6 +208,7 @@ export default function DramaPage() {
                     }
                     setVideoProcessing(false);
                     setVideoAccess(data);
+                    setVideoErrorMessage(null);
                 })
                 .catch((err) => {
                     if (cancelled) return;
@@ -215,6 +218,8 @@ export default function DramaPage() {
                         setOpenAuthDialog(true);
                     } else {
                         console.error(err);
+                        // Vaqtincha diagnostika uchun - haqiqiy xatoni ekranda ko'rsatamiz
+                        setVideoErrorMessage(err.message || "Noma'lum xato");
                     }
                 })
                 .finally(() => {
@@ -224,6 +229,7 @@ export default function DramaPage() {
 
         setVideoAccess(null);
         setVideoProcessing(false);
+        setVideoErrorMessage(null);
         fetchAccess(true);
 
         return () => {
@@ -391,13 +397,22 @@ export default function DramaPage() {
                                     sx={{
                                         height: 400,
                                         display: "flex",
+                                        flexDirection: "column",
+                                        gap: 1,
                                         alignItems: "center",
-                                        justifyContent: "center"
+                                        justifyContent: "center",
+                                        px: 3,
+                                        textAlign: "center",
                                     }}
                                 >
                                     <Typography color="error">
                                         {user ? langData.videoNotFound : "Tomosha qilish uchun tizimga kiring"}
                                     </Typography>
+                                    {videoErrorMessage && (
+                                        <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.5)", wordBreak: "break-word" }}>
+                                            Texnik xato: {videoErrorMessage}
+                                        </Typography>
+                                    )}
                                 </Box>
                             )}
                             {videoAccess?.ads && videoAccess?.remainingFree !== null && (
