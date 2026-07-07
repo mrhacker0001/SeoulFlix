@@ -293,9 +293,63 @@ export default function DramaPage() {
             }} />
 
             <Box sx={{ position: "relative", zIndex: 1, px: { xs: 2, md: 5 }, pt: 4 }}>
-                <Typography variant="h3" align="center" fontWeight="900" sx={{ textTransform: "uppercase", fontFamily: 'Equinox', letterSpacing: 2, mb: 1 }}>
+                <Typography variant="h3" align="center" fontWeight="900" sx={{ textTransform: "uppercase", fontFamily: 'Equinox', letterSpacing: 2, mb: 1, fontSize: { xs: "1.5rem", sm: "2.2rem", md: "3rem" } }}>
                     {drama.title}
                 </Typography>
+
+                {/* To'liq drama ma'lumotlari - yil, til, davomiylik, yosh chegarasi, holat, janrlar */}
+                <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
+                    justifyContent="center"
+                    alignItems="center"
+                    sx={{ mb: 2, rowGap: 1 }}
+                >
+                    {drama.ageRating && (
+                        <Box sx={{ bgcolor: "rgba(255,255,255,0.15)", px: 1, py: 0.3, borderRadius: 1, fontSize: "12px", fontWeight: "bold" }}>
+                            {drama.ageRating}
+                        </Box>
+                    )}
+                    {drama.year && (
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.75)" }}>{drama.year}</Typography>
+                    )}
+                    {drama.lang && (
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.75)" }}>• {drama.lang.toUpperCase()} Sub/Dub</Typography>
+                    )}
+                    {drama.duration && (
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.75)" }}>• {drama.duration} min</Typography>
+                    )}
+                    {drama.episodeCount ? (
+                        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.75)" }}>• {drama.episodeCount} qism</Typography>
+                    ) : null}
+                    {drama.status && (
+                        <Box sx={{
+                            bgcolor: drama.status === "Yakunlangan" ? "#1b5e20" : "rgba(229,9,20,0.2)",
+                            color: drama.status === "Yakunlangan" ? "#4caf50" : "#e50914",
+                            px: 1, py: 0.3, borderRadius: 1, fontSize: "12px", fontWeight: "bold"
+                        }}>
+                            ● {drama.status}
+                        </Box>
+                    )}
+                </Stack>
+
+                {Array.isArray(drama.genres) && drama.genres.length > 0 && (
+                    <Stack direction="row" spacing={1} flexWrap="wrap" justifyContent="center" sx={{ mb: 3, rowGap: 1 }}>
+                        {drama.genres.map((genre) => (
+                            <Box
+                                key={genre}
+                                sx={{
+                                    border: "1px solid rgba(255,255,255,0.3)",
+                                    color: "rgba(255,255,255,0.85)",
+                                    px: 1.2, py: 0.3, borderRadius: 5, fontSize: "11px"
+                                }}
+                            >
+                                {genre}
+                            </Box>
+                        ))}
+                    </Stack>
+                )}
 
                 {/* Qismlar ro'yxati */}
                 <Stack direction="row" spacing={1} sx={{ overflowX: "auto", pb: 2, mb: 4, justifyContent: { xs: "flex-start", md: "center" }, "&::-webkit-scrollbar": { display: "none" } }}>

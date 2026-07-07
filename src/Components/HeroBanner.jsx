@@ -5,13 +5,16 @@ import {
     Typography,
     Button,
     Stack,
+    Chip,
+    IconButton,
+    LinearProgress,
 } from "@mui/material";
 
 import { Link } from "react-router-dom";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-// import FavoriteIcon from "@mui/icons-material/Favorite";
-// import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 
@@ -63,11 +66,11 @@ export default function HeroBanner({ banners }) {
                         sx={{
                             position: "relative",
                             height: {
-                                xs: "320px",
+                                xs: "280px",
                                 sm: "450px",
                                 md: "600px"
                             },
-                            borderRadius: "24px",
+                            borderRadius: { xs: "14px", sm: "24px" },
                             overflow: "hidden",
                             cursor: "pointer",
                         }}
@@ -138,7 +141,7 @@ export default function HeroBanner({ banners }) {
                                 justifyContent: "center",
 
                                 px: {
-                                    xs: 3,
+                                    xs: 2,
                                     sm: 6,
                                     md: 8
                                 },
@@ -151,20 +154,25 @@ export default function HeroBanner({ banners }) {
                             <Typography
                                 sx={{
                                     fontSize: {
-                                        xs: "2rem",
+                                        xs: "1.4rem",
                                         sm: "3.5rem",
                                         md: "4.7rem"
                                     },
 
                                     fontWeight: 900,
-                                    lineHeight: 1.05,
+                                    lineHeight: 1.15,
 
                                     color: "#fff",
 
                                     textShadow:
                                         "0 5px 25px rgba(0,0,0,0.9)",
 
-                                    letterSpacing: "-2px",
+                                    letterSpacing: { xs: "-0.5px", sm: "-2px" },
+
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: { xs: 2, sm: "unset" },
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
                                 }}
                             >
                                 {banner.title}
@@ -173,17 +181,22 @@ export default function HeroBanner({ banners }) {
                             {/* SUBTITLE */}
                             <Typography
                                 sx={{
-                                    mt: 2,
+                                    mt: { xs: 0.75, sm: 2 },
 
                                     color: "rgba(255,255,255,0.82)",
 
                                     fontSize: {
-                                        xs: "0.95rem",
+                                        xs: "0.7rem",
                                         sm: "1.1rem"
                                     },
 
-                                    lineHeight: 1.8,
+                                    lineHeight: { xs: 1.3, sm: 1.8 },
                                     maxWidth: "620px",
+
+                                    display: { xs: "-webkit-box", sm: "block" },
+                                    WebkitLineClamp: { xs: 1, sm: "unset" },
+                                    WebkitBoxOrient: "vertical",
+                                    overflow: "hidden",
                                 }}
                             >
                                 {banner.subtitle}
@@ -192,51 +205,52 @@ export default function HeroBanner({ banners }) {
                             {/* INFO ROW */}
                             <Stack
                                 direction="row"
-                                spacing={3}
+                                spacing={{ xs: 1.5, sm: 3 }}
                                 sx={{
-                                    mt: 3,
+                                    mt: { xs: 1.25, sm: 3 },
                                     color: "#fff",
                                     flexWrap: "wrap",
                                     alignItems: "center",
+                                    fontSize: { xs: "0.7rem", sm: "1rem" },
                                 }}
                             >
 
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction="row" spacing={0.5} alignItems="center">
                                     <StarIcon
                                         sx={{
                                             color: "#ffd54f",
-                                            fontSize: "1.1rem"
+                                            fontSize: { xs: "0.85rem", sm: "1.1rem" }
                                         }}
                                     />
 
-                                    <Typography fontWeight="bold">
+                                    <Typography fontWeight="bold" fontSize="inherit">
                                         {banner.imdb} IMDB
                                     </Typography>
                                 </Stack>
 
-                                <Typography>
+                                <Typography fontSize="inherit">
                                     🎬 {banner.genre}
                                 </Typography>
 
-                                <Typography>
+                                <Typography fontSize="inherit" sx={{ display: { xs: "none", sm: "block" } }}>
                                     📺 {banner.year}
                                 </Typography>
 
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction="row" spacing={0.5} alignItems="center">
                                     <AccessTimeIcon
                                         sx={{
-                                            fontSize: "1rem"
+                                            fontSize: { xs: "0.8rem", sm: "1rem" }
                                         }}
                                     />
 
-                                    <Typography>
+                                    <Typography fontSize="inherit">
                                         {banner.duration}
                                     </Typography>
                                 </Stack>
 
                             </Stack>
 
-                           
+
                             {/* {banner.progress > 0 && (
                                 <Box sx={{ mt: 3, maxWidth: "350px" }}>
 
@@ -273,7 +287,7 @@ export default function HeroBanner({ banners }) {
                                 direction="row"
                                 spacing={2}
                                 sx={{
-                                    mt: 4,
+                                    mt: { xs: 1.75, sm: 4 },
                                     flexWrap: "wrap"
                                 }}
                             >
@@ -290,14 +304,14 @@ export default function HeroBanner({ banners }) {
                                     sx={{
                                         bgcolor: "#e50914",
 
-                                        px: 4,
-                                        py: 1.5,
+                                        px: { xs: 2.5, sm: 4 },
+                                        py: { xs: 0.75, sm: 1.5 },
 
-                                        borderRadius: "14px",
+                                        borderRadius: { xs: "10px", sm: "14px" },
 
                                         fontWeight: "bold",
 
-                                        fontSize: "1rem",
+                                        fontSize: { xs: "0.8rem", sm: "1rem" },
 
                                         textTransform: "none",
 
