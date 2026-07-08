@@ -14,87 +14,11 @@
     <link rel="manifest" href="./seoulflix.png" />
     <title>SEOULFLIX</title>
 
-    <!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
 
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
-
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
-
-<!-- Yandex.RTB -->
-<script>window.yaContextCb=window.yaContextCb||[]</script>
-<script src="https://yandex.ru/ads/system/context.js" async></script>
   </head>
   <body>
 </script>
 <div id="root"></div>
-<!-- Yandex.RTB R-A-19265130-1 -->
-<div id="yandex_rtb_R-A-19265130-1"></div>
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19265130-1",
-        "renderTo": "yandex_rtb_R-A-19265130-1"
-    })
-})
-</script>
 
-<!-- Yandex.RTB R-A-19265130-2 -->
-<div id="yandex_rtb_R-A-19265130-2"></div>
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19265130-2",
-        "renderTo": "yandex_rtb_R-A-19265130-2",
-        "type": "feed"
-    })
-})
-</script>
-
-<!-- Yandex.RTB R-A-19265130-3 -->
-<script>
-window.addEventListener("load", () => {
-    const render = (imageId) => {
-        window.yaContextCb.push(() => {
-            Ya.Context.AdvManager.render({
-                "renderTo": imageId,
-                "blockId": "R-A-19265130-3",
-                "type": "inImage"
-            })
-        })
-    }
-    const renderInImage = (images) => {
-        if (!images.length) {
-            return
-        }
-        const image = images.shift()
-        image.id = `yandex_rtb_R-A-19265130-3-${Math.random().toString(16).slice(2)}`
-        if (image.tagName === "IMG" && !image.complete) {
-            image.addEventListener("load", () => {
-                render(image.id)
-            }, { once: true })
-        } else {
-            render(image.id)
-        }
-        renderInImage(images)
-    }
-    renderInImage(Array.from(document.querySelectorAll("img")))
-}, { once: true })
-</script>
-
-<!-- Yandex.RTB R-A-19265130-4 -->
-<script>
-window.yaContextCb.push(() => {
-    Ya.Context.AdvManager.render({
-        "blockId": "R-A-19265130-4",
-        "type": "topAd"
-    })
-})
-</script>
   </body>
 </html>
